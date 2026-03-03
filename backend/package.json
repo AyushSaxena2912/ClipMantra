@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev src/server.ts",
-    "worker": "ts-node-dev src/queue/worker.ts"
-  },
+  "dev": "ts-node-dev src/server.ts",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "worker": "node dist/queue/worker.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

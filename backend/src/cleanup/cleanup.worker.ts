@@ -4,7 +4,7 @@ import { pool } from "../db/pool";
 
 const STORAGE_ROOT = path.resolve(process.cwd(), "storage");
 
-// ✅ 15 minutes test mode
+// 15 minutes test mode
 // const EXPIRY_TIME =  * 60 * 1000;
 const EXPIRY_TIME = 24 * 60 * 60 * 1000;
 
@@ -92,7 +92,7 @@ const runCleanup = async () => {
 export const startCleanupWorker = () => {
   console.log("Cleanup worker started (15 min test mode)");
 
-  // ✅ Check every 1 minute
+  // Check every 1 minute
   setInterval(runCleanup, 60 * 1000);
   // setInterval(runCleanup, 60 * 60 * 1000); // every 1 hour
 
