@@ -2,23 +2,16 @@ import Redis from "ioredis";
 
 /*
   Main Redis client
-  - Queues (lpush, brpop)
-  - Publish events
-  - Normal commands
 */
-export const redis = new Redis({
-  host: "127.0.0.1",
-  port: 6379,
+export const redis = new Redis(process.env.REDIS_URL!, {
+  maxRetriesPerRequest: null,
 });
 
 /*
-  Separate Redis client
-  - ONLY for Pub/Sub (SSE)
-  - Never use this for normal commands
+  Separate Redis client for Pub/Sub
 */
-export const redisSubscriber = new Redis({
-  host: "127.0.0.1",
-  port: 6379,
+export const redisSubscriber = new Redis(process.env.REDIS_URL!, {
+  maxRetriesPerRequest: null,
 });
 
 /* ----------------------------- */
