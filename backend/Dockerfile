@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
     && chmod a+rx /usr/local/bin/yt-dlp \
-    && pip3 install faster-whisper --break-system-packages \
+    && pip3 install faster-whisper bgutil-ytdlp-pot-provider --break-system-packages \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
