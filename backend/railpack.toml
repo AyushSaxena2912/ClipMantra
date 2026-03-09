@@ -1,0 +1,5 @@
+[phases.setup]
+aptPackages = ["ffmpeg", "python3", "python3-pip"]
+
+[phases.install]
+cmds = ["pip3 install faster-whisper yt-dlp"]

@@ -112,7 +112,7 @@ const startWorker = async () => {
         const transcriptPath = `storage/transcripts/${jobId}.json`;
 
         await execAsync(
-          `venv/bin/python scripts/transcribe.py "${jobData.audio_path}" "${transcriptPath}"`
+          `python3 scripts/transcribe.py "${jobData.audio_path}" "${transcriptPath}"`
         );
 
         await pool.query(
