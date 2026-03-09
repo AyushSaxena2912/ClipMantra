@@ -81,9 +81,22 @@ const startWorker = async () => {
 
         await publishStatus(jobId, "downloading");
 
-        const videoPath = await execAsync(
-       `yt-dlp --extractor-args "youtube:player_client=android" -f "b[ext=mp4]/best[ext=mp4]/best" -o "storage/videos/${jobId}.mp4" "${jobData.url}"`
+        const cookiesBase64 = process.env.YOUTUBE_COOKIES_BASE64;
+        const cookiesPath = `/tmp/yt_cookies_${jobId}.txt`;
+
+        if (cookiesBase64) {
+          fs.writeFileSync(cookiesPath, Buffer.from(cookiesBase64, 'base64').toString('utf-8'));
+        }
+
+        const cookieFlag = cookiesBase64 ? `--cookies "${cookiesPath}"` : '';
+
+        await execAsync(
+          `yt-dlp ${cookieFlag} -f "b[ext=mp4]/best[ext=mp4]/best" -o "storage/videos/${jobId}.mp4" "${jobData.url}"`
         );
+
+        if (cookiesBase64 && fs.existsSync(cookiesPath)) {
+          fs.unlinkSync(cookiesPath);
+        }
 
         const audioPath = `storage/audio/${jobId}.mp3`;
 
