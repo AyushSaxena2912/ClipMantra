@@ -82,7 +82,7 @@ const startWorker = async () => {
         await publishStatus(jobId, "downloading");
 
         const videoPath = await execAsync(
-        `yt-dlp -f mp4 -o "storage/videos/${jobId}.mp4" "${jobData.url}"`
+       `yt-dlp --extractor-args "youtube:player_client=android" -f "b[ext=mp4]/best[ext=mp4]/best" -o "storage/videos/${jobId}.mp4" "${jobData.url}"`
         );
 
         const audioPath = `storage/audio/${jobId}.mp3`;
