@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["ffmpeg", "yt-dlp", "python3"]
+
+[phases.install]
+cmds = ["pip install faster-whisper"]
+```
+
+**Step 2** — `backend` folder mein `requirements.txt` file banao aur ye paste karo:
+```
+faster-whisper
+```
+
+**Step 3** — `src/queue/worker.ts` mein ye line dhundo:
+```
+venv/bin/python scripts/transcribe.py
+```
+Aur isko change karo:
+```
+python3 scripts/transcribe.py
