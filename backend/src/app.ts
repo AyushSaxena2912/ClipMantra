@@ -11,7 +11,7 @@ const app = express();
 /* -------------------- */
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:3001',  // ✅ Added your current port
+  'http://localhost:3001',
   'http://localhost:5173',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001'
@@ -20,7 +20,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl)
       if (!origin) return callback(null, true);
       
       if (allowedOrigins.indexOf(origin) === -1) {
@@ -37,12 +36,11 @@ app.use(
   })
 );
 
-// ✅ Handle preflight requests explicitly
 app.options('*', cors());
-
 /* -------------------- */
 /*   Middlewares        */
 /* -------------------- */
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -67,6 +65,7 @@ app.use(
 /* -------------------- */
 /*   Health Check       */
 /* -------------------- */
+
 app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -83,16 +82,12 @@ app.get("/api/test", (_req, res) => {
 /* -------------------- */
 /*   404 Handler        */
 /* -------------------- */
-app.use((_req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
 
+// app./
 /* -------------------- */
 /*   Global Error       */
 /* -------------------- */
+
 app.use(
   (
     err: any,

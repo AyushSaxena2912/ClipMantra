@@ -10,7 +10,9 @@ import {
 
 import { authenticate } from "./auth.middleware";
 
+
 const router = Router();
+router.use("/api/auth", router);
 
 /* -------------------- */
 /*   Public Routes      */
