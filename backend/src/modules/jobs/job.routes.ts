@@ -22,7 +22,7 @@ router.get("/", authenticate, handleGetAllJobs);
 /*   Must come BEFORE /:id       */
 /* ----------------------------- */
 
-router.get("/:id/stream", authenticate, handleJobStream);
+router.get("/:id/stream", handleJobStream);
 
 /* ----------------------------- */
 /*   GET SINGLE JOB              */
