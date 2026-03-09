@@ -58,7 +58,7 @@ const startWorker = async () => {
     let jobId: string | null = null;
 
     try {
-      const job = await redis.brpop(queueName, 0);
+      const job = await redis.brpop(queueName, 5);
       if (!job) continue;
 
       jobId = job[1];
