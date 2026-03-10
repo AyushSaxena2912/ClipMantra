@@ -9,10 +9,9 @@ export async function getVideoDownloadUrl(videoId: string) {
       {
         params: { videoId },
         headers: {
-          "X-RapidAPI-Key": process.env.RAPID_API_KEY!,
+          "X-RapidAPI-Key": process.env.RAPID_API_KEY,
           "X-RapidAPI-Host": "youtube-media-downloader.p.rapidapi.com",
         },
-        timeout: 15000,
       }
     );
 
@@ -22,36 +21,27 @@ export async function getVideoDownloadUrl(videoId: string) {
       throw new Error("No video streams found");
     }
 
-    /* filter streams that contain audio + mp4 */
+    /* pick stream with audio */
 
     const streams = data.videos.items.filter(
-      (v: any) =>
-        v.hasAudio &&
-        v.mimeType?.includes("mp4") &&
-        v.itag
+      (v: any) => v.hasAudio && v.url
     );
 
     if (!streams.length) {
-      throw new Error("No valid MP4 stream with audio");
+      throw new Error("No stream with audio found");
     }
 
-    /* pick highest resolution */
+    /* pick best quality */
 
     const video = streams.sort(
       (a: any, b: any) => (b.height || 0) - (a.height || 0)
     )[0];
 
-    return {
-      videoId,
-      itag: video.itag
-    };
+    return video.url;
 
   } catch (err: any) {
 
-    console.error(
-      "RapidAPI error:",
-      err?.response?.data || err.message
-    );
+    console.error("RapidAPI error:", err?.response?.data || err.message);
 
     throw new Error("Failed to fetch video download URL");
 
