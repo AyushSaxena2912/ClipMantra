@@ -1,17 +1,17 @@
-# ✂️ ClipMantra
+# ClipMantra
 
 > **Auto-generate viral short clips from long videos using AI.**  
 > Paste a YouTube URL → Gemini AI detects the best moments → FFmpeg renders ready-to-post clips for Shorts, Reels & TikTok.
 
 ---
 
-## 🚀 What It Does
+## What It Does
 
 ClipMantra takes a long-form YouTube video URL, downloads it, transcribes the audio using **Faster-Whisper**, sends the transcript to **Google Gemini 2.5 Flash** to detect the most viral moments, and automatically renders short clips — all through a fully async, queue-driven pipeline with real-time status updates via **Server-Sent Events (SSE)**.
 
 ---
 
-## 🧠 How the Pipeline Works
+## How the Pipeline Works
 
 ```
 User submits YouTube URL
@@ -40,12 +40,12 @@ Cleanup Worker  →  Files auto-deleted 24hrs after completion
 | **Queue / Cache** | Redis (via `ioredis`) |
 | **AI Highlights** | Google Gemini 2.5 Flash |
 | **Transcription** | Python + Faster-Whisper (tiny model, CPU/int8) |
-| **Video Processing** | `yt-dlp` + `ffmpeg` |
+| **Video Processing** | `yt-dlp/Rapid API` + `ffmpeg` |
 | **Auth** | JWT + bcrypt + Google OAuth2 |
 | **Email** | Nodemailer (Gmail SMTP) |
 | **Real-time** | Server-Sent Events (SSE) + Redis Pub/Sub |
 | **Containerization** | Docker |
-| **Deployment** | Railway |
+| **Deployment** | Railway + Vercel |
 
 ---
 
@@ -121,7 +121,7 @@ Cleanup Worker  →  Files auto-deleted 24hrs after completion
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 
@@ -225,7 +225,7 @@ npm run dev
 
 ---
 
-## 🐳 Docker
+## Docker
 
 A `Dockerfile` is included for containerized deployment. It installs all system dependencies including `ffmpeg`, `yt-dlp`, and `faster-whisper` automatically.
 
@@ -238,7 +238,7 @@ docker run -p 8000:8000 --env-file .env clipmantra
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 ### Backend `.env`
 
@@ -365,7 +365,7 @@ queued → downloading → transcribing → rendering → completed
 
 ---
 
-## 🔒 Security Features
+## Security Features
 
 - **Password rules:** 8–15 chars, requires uppercase, lowercase, number & special character (`@$!%*?&`)
 - **Bcrypt hashing:** All passwords hashed with salt rounds of 10
@@ -377,13 +377,13 @@ queued → downloading → transcribing → rendering → completed
 
 ---
 
-## 🧹 Cleanup Worker
+## Cleanup Worker
 
 ClipMantra automatically deletes stored files (video, audio, transcript, clips) **24 hours** after a job completes to free up disk space. Job metadata is preserved in the database with file paths set to `NULL`. The cleanup worker checks every 60 seconds on startup.
 
 ---
 
-## 🎨 Frontend Pages
+## Frontend Pages
 
 | Page | Description |
 |---|---|
@@ -396,7 +396,7 @@ ClipMantra automatically deletes stored files (video, audio, transcript, clips) 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome!
 
