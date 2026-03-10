@@ -5,23 +5,38 @@ from faster_whisper import WhisperModel
 audio_path = sys.argv[1]
 output_path = sys.argv[2]
 
-# Railway friendly model
-model = WhisperModel("tiny", device="cpu", compute_type="int8")
+try:
 
-segments, info = model.transcribe(audio_path)
+    # Railway friendly model
+    model = WhisperModel(
+        "tiny",
+        device="cpu",
+        compute_type="int8"
+    )
 
-result = {
-    "text": "",
-    "segments": []
-}
+    segments, info = model.transcribe(audio_path)
 
-for segment in segments:
-    result["text"] += segment.text + " "
-    result["segments"].append({
-        "start": float(segment.start),
-        "end": float(segment.end),
-        "text": segment.text
-    })
+    result = {
+        "text": "",
+        "segments": []
+    }
 
-with open(output_path, "w") as f:
-    json.dump(result, f)
+    for segment in segments:
+
+        result["text"] += segment.text + " "
+
+        result["segments"].append({
+            "start": float(segment.start),
+            "end": float(segment.end),
+            "text": segment.text.strip()
+        })
+
+    with open(output_path, "w") as f:
+        json.dump(result, f)
+
+    print("Transcription completed")
+
+except Exception as e:
+
+    print("Transcription error:", str(e))
+    sys.exit(1)

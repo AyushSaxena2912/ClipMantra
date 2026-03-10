@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 import https from "https";
+import axios from "axios";
 
 import { redis } from "./redis";
 import { pool } from "../db/pool";
@@ -54,7 +55,6 @@ const downloadFile = (url: string, path: string) => {
 
       https.get(downloadUrl, (res) => {
 
-        // handle redirects
         if (res.statusCode === 301 || res.statusCode === 302) {
           if (res.headers.location) {
             return download(res.headers.location);
@@ -87,6 +87,7 @@ const downloadFile = (url: string, path: string) => {
 };
 
 const startWorker = async () => {
+
   console.log(`Worker started for role: ${role}`);
 
   ensureFolders();
@@ -94,6 +95,7 @@ const startWorker = async () => {
   const queueName = `queue:${role}`;
 
   while (true) {
+
     let jobId: string | null = null;
 
     try {
@@ -148,9 +150,15 @@ const startWorker = async () => {
           `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
         );
 
+        /* ---- upload audio to R2 ---- */
+
+        const audioKey = `audio/${jobId}.mp3`;
+
+        const audioUrl = await uploadToR2(audioPath, audioKey);
+
         await pool.query(
           `UPDATE jobs SET video_path = $1, audio_path = $2 WHERE id = $3`,
-          [videoPath, audioPath, jobId]
+          [videoPath, audioUrl, jobId]
         );
 
         await redis.lpush("queue:transcribe", jobId);
@@ -171,8 +179,27 @@ const startWorker = async () => {
 
         const transcriptPath = `storage/transcripts/${jobId}.json`;
 
+        /* ---- download audio from R2 ---- */
+
+        const localAudioPath = `storage/audio/${jobId}.mp3`;
+
+        const response = await axios({
+          url: jobData.audio_path,
+          method: "GET",
+          responseType: "stream",
+        });
+
+        const writer = fs.createWriteStream(localAudioPath);
+
+        response.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+          writer.on("finish", resolve);
+          writer.on("error", reject);
+        });
+
         await execAsync(
-          `python3 scripts/transcribe.py "${jobData.audio_path}" "${transcriptPath}"`
+          `python3 scripts/transcribe.py "${localAudioPath}" "${transcriptPath}"`
         );
 
         await pool.query(
@@ -308,6 +335,7 @@ const startWorker = async () => {
     }
 
   }
+
 };
 
 startWorker();
