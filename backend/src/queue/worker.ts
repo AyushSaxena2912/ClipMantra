@@ -48,42 +48,30 @@ const ensureFolders = () => {
   });
 };
 
-const downloadFile = (url: string, path: string) => {
-  return new Promise((resolve, reject) => {
+const downloadFile = async (url: string, path: string) => {
 
-    const download = (downloadUrl: string) => {
-
-      https.get(downloadUrl, (res) => {
-
-        if (res.statusCode === 301 || res.statusCode === 302) {
-          if (res.headers.location) {
-            return download(res.headers.location);
-          }
-        }
-
-        if (res.statusCode !== 200) {
-          reject(new Error(`Download failed: ${res.statusCode}`));
-          return;
-        }
-
-        const file = fs.createWriteStream(path);
-
-        res.pipe(file);
-
-        file.on("finish", () => {
-          file.close();
-          resolve(true);
-        });
-
-        file.on("error", reject);
-
-      }).on("error", reject);
-
-    };
-
-    download(url);
-
+  const response = await axios({
+    method: "GET",
+    url,
+    responseType: "stream",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      "Accept": "*/*",
+      "Referer": "https://www.youtube.com/",
+    },
+    maxRedirects: 5,
   });
+
+  const writer = fs.createWriteStream(path);
+
+  response.data.pipe(writer);
+
+  await new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
+  });
+
 };
 
 const startWorker = async () => {
@@ -115,7 +103,7 @@ const startWorker = async () => {
       const jobData = result.rows[0];
       if (!jobData) continue;
 
-      /* ------------ DOWNLOAD ROLE ------------ */
+      /* ================= DOWNLOAD WORKER ================= */
 
       if (role === "download") {
 
@@ -150,15 +138,19 @@ const startWorker = async () => {
           `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
         );
 
-        /* ---- upload audio to R2 ---- */
+        /* upload video to R2 */
+
+        const videoKey = `videos/${jobId}.mp4`;
+        const videoUrlR2 = await uploadToR2(videoPath, videoKey);
+
+        /* upload audio to R2 */
 
         const audioKey = `audio/${jobId}.mp3`;
-
         const audioUrl = await uploadToR2(audioPath, audioKey);
 
         await pool.query(
           `UPDATE jobs SET video_path = $1, audio_path = $2 WHERE id = $3`,
-          [videoPath, audioUrl, jobId]
+          [videoUrlR2, audioUrl, jobId]
         );
 
         await redis.lpush("queue:transcribe", jobId);
@@ -166,7 +158,7 @@ const startWorker = async () => {
         log(jobId, "Moved to transcribe queue.");
       }
 
-      /* ------------ TRANSCRIBE ROLE ------------ */
+      /* ================= TRANSCRIBE WORKER ================= */
 
       if (role === "transcribe") {
 
@@ -178,8 +170,6 @@ const startWorker = async () => {
         await publishStatus(jobId, "transcribing");
 
         const transcriptPath = `storage/transcripts/${jobId}.json`;
-
-        /* ---- download audio from R2 ---- */
 
         const localAudioPath = `storage/audio/${jobId}.mp3`;
 
@@ -212,7 +202,7 @@ const startWorker = async () => {
         log(jobId, "Moved to render queue.");
       }
 
-      /* ------------ RENDER ROLE ------------ */
+      /* ================= RENDER WORKER ================= */
 
       if (role === "render") {
 
@@ -222,6 +212,23 @@ const startWorker = async () => {
         );
 
         await publishStatus(jobId, "rendering");
+
+        const localVideoPath = `storage/videos/${jobId}.mp4`;
+
+        const videoResponse = await axios({
+          url: jobData.video_path,
+          method: "GET",
+          responseType: "stream",
+        });
+
+        const videoWriter = fs.createWriteStream(localVideoPath);
+
+        videoResponse.data.pipe(videoWriter);
+
+        await new Promise((resolve, reject) => {
+          videoWriter.on("finish", resolve);
+          videoWriter.on("error", reject);
+        });
 
         const transcriptRaw = fs.readFileSync(
           jobData.transcript_path,
@@ -284,7 +291,7 @@ const startWorker = async () => {
           const outputClipPath = `${clipsDir}/clip_${i + 1}.mp4`;
 
           await execAsync(
-            `ffmpeg -ss ${highlights[i].start} -i "${jobData.video_path}" -t ${
+            `ffmpeg -ss ${highlights[i].start} -i "${localVideoPath}" -t ${
               highlights[i].end - highlights[i].start
             } -c:v libx264 -c:a aac -movflags +faststart "${outputClipPath}" -y`
           );
