@@ -1,10 +1,13 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
-import path from "path";
 import { redis } from "./redis";
 import { pool } from "../db/pool";
 import { detectHighlightsWithGemini } from "../ai/gemini";
+import { getVideoDownloadUrl } from "../utils/youtube";
+import { extractVideoId } from "../utils/videoId";
+import { uploadToR2 } from "../utils/r2";
+import https from "https";
 
 const execAsync = promisify(exec);
 const role = process.argv[2];
@@ -24,10 +27,7 @@ const log = (jobId: string, message: string) => {
 };
 
 const publishStatus = async (jobId: string, status: string) => {
-  await redis.publish(
-    `job:${jobId}`,
-    JSON.stringify({ status })
-  );
+  await redis.publish(`job:${jobId}`, JSON.stringify({ status }));
 };
 
 const ensureFolders = () => {
@@ -45,8 +45,6 @@ const ensureFolders = () => {
     }
   });
 };
-
-/* ------------------ WORKER LOOP ------------------ */
 
 const startWorker = async () => {
   console.log(`Worker started for role: ${role}`);
@@ -73,6 +71,7 @@ const startWorker = async () => {
       if (!jobData) continue;
 
       /* ------------ DOWNLOAD ROLE ------------ */
+
       if (role === "download") {
         await pool.query(
           `UPDATE jobs SET status = 'downloading' WHERE id = $1`,
@@ -81,26 +80,47 @@ const startWorker = async () => {
 
         await publishStatus(jobId, "downloading");
 
-        await execAsync(
-          `yt-dlp -f "b[ext=mp4]/best[ext=mp4]/best" -o "storage/videos/${jobId}.mp4" "${jobData.url}"`
-        );
+        const videoId = extractVideoId(jobData.url);
+
+        if (!videoId) {
+          throw new Error("Invalid YouTube URL");
+        }
+
+        const videoUrl = await getVideoDownloadUrl(videoId);
+
+        const videoPath = `storage/videos/${jobId}.mp4`;
+
+        await new Promise((resolve, reject) => {
+          const file = fs.createWriteStream(videoPath);
+
+          https.get(videoUrl, (res) => {
+            res.pipe(file);
+
+            file.on("finish", () => {
+              file.close();
+              resolve(true);
+            });
+          }).on("error", reject);
+        });
 
         const audioPath = `storage/audio/${jobId}.mp3`;
 
         await execAsync(
-          `ffmpeg -i "storage/videos/${jobId}.mp4" -vn -acodec libmp3lame "${audioPath}" -y`
+          `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
         );
 
         await pool.query(
           `UPDATE jobs SET video_path = $1, audio_path = $2 WHERE id = $3`,
-          [`storage/videos/${jobId}.mp4`, audioPath, jobId]
+          [videoPath, audioPath, jobId]
         );
 
         await redis.lpush("queue:transcribe", jobId);
+
         log(jobId, "Moved to transcribe queue.");
       }
 
       /* ------------ TRANSCRIBE ROLE ------------ */
+
       if (role === "transcribe") {
         await pool.query(
           `UPDATE jobs SET status = 'transcribing' WHERE id = $1`,
@@ -125,6 +145,7 @@ const startWorker = async () => {
       }
 
       /* ------------ RENDER ROLE ------------ */
+
       if (role === "render") {
         await pool.query(
           `UPDATE jobs SET status = 'rendering' WHERE id = $1`,
@@ -189,7 +210,13 @@ const startWorker = async () => {
             } -c:v libx264 -c:a aac -movflags +faststart "${outputClipPath}" -y`
           );
 
-          generatedClips.push(outputClipPath);
+          const key = `clips/${jobId}/clip_${i + 1}.mp4`;
+
+          const publicUrl = await uploadToR2(outputClipPath, key);
+
+          generatedClips.push(publicUrl);
+
+          fs.unlinkSync(outputClipPath);
         }
 
         await pool.query(
