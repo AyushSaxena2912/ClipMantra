@@ -10,7 +10,7 @@ export const sendOTPEmail = async(email: string, otp: string) => {
     });
 
     await transporter.sendMail({
-        from: `"Clipify Supoort"<${process.env.MAIL_USER}`,
+        from: `"ClipMantra Supoort"<${process.env.MAIL_USER}`,
         to: email,
         subject: "Password Reset OTP",
         html:  `

@@ -23,7 +23,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => (
         <span style={{
           fontFamily: "'Syne', sans-serif", fontSize: 20,
           fontWeight: 800, color: "#fff",
-        }}>Clipify</span>
+        }}>ClipMantra</span>
       </div>
     </div>
 

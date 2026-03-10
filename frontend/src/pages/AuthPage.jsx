@@ -50,7 +50,7 @@ const AuthPage = ({ onLogin, toast }) => {
   };
 
   const titles    = { login: "Sign In", register: "Create Account", forgot: "Reset Password", reset: "Enter OTP" };
-  const subtitles = { login: "Welcome back to Clipify", register: "Start clipping viral moments", forgot: "We'll send an OTP to your email", reset: "Enter the OTP from your email" };
+  const subtitles = { login: "Welcome back to ClipMantra", register: "Start clipping viral moments", forgot: "We'll send an OTP to your email", reset: "Enter the OTP from your email" };
 
   return (
     <div style={{
@@ -81,7 +81,7 @@ const AuthPage = ({ onLogin, toast }) => {
               background: "linear-gradient(135deg, #00e599, #00aaff)",
               borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
             }}>✂️</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: -1 }}>Clipify</span>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: -1 }}>ClipMantra</span>
           </div>
           <p style={{ color: "#666", fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>
             AI-Powered Viral Clip Extractor
