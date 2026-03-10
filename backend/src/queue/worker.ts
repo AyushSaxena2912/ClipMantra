@@ -1,7 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
-import https from "https";
 import axios from "axios";
 
 import { redis } from "./redis";
@@ -46,32 +45,6 @@ const ensureFolders = () => {
       fs.mkdirSync(folder, { recursive: true });
     }
   });
-};
-
-const downloadFile = async (url: string, path: string) => {
-
-  const response = await axios({
-    method: "GET",
-    url,
-    responseType: "stream",
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-      "Accept": "*/*",
-      "Referer": "https://www.youtube.com/",
-    },
-    maxRedirects: 5,
-  });
-
-  const writer = fs.createWriteStream(path);
-
-  response.data.pipe(writer);
-
-  await new Promise((resolve, reject) => {
-    writer.on("finish", resolve);
-    writer.on("error", reject);
-  });
-
 };
 
 const startWorker = async () => {
@@ -120,11 +93,31 @@ const startWorker = async () => {
           throw new Error("Invalid YouTube URL");
         }
 
-        const videoUrl = await getVideoDownloadUrl(videoId);
+        const { videoId: id, itag } = await getVideoDownloadUrl(videoId);
+
+        const videoDownloadUrl =
+        `https://youtube-media-downloader.p.rapidapi.com/v2/video/download?videoId=${id}&itag=${itag}`;
 
         const videoPath = `storage/videos/${jobId}.mp4`;
 
-        await downloadFile(videoUrl, videoPath);
+        const response = await axios({
+          method: "GET",
+          url: videoDownloadUrl,
+          responseType: "stream",
+          headers: {
+            "X-RapidAPI-Key": process.env.RAPID_API_KEY,
+            "X-RapidAPI-Host": "youtube-media-downloader.p.rapidapi.com"
+          }
+        });
+
+        const writer = fs.createWriteStream(videoPath);
+
+        response.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+          writer.on("finish", resolve);
+          writer.on("error", reject);
+        });
 
         const stats = fs.statSync(videoPath);
 
@@ -138,12 +131,8 @@ const startWorker = async () => {
           `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
         );
 
-        /* upload video to R2 */
-
         const videoKey = `videos/${jobId}.mp4`;
         const videoUrlR2 = await uploadToR2(videoPath, videoKey);
-
-        /* upload audio to R2 */
 
         const audioKey = `audio/${jobId}.mp3`;
         const audioUrl = await uploadToR2(audioPath, audioKey);

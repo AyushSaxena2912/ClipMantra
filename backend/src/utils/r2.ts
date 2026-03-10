@@ -14,28 +14,45 @@ const r2 = new S3Client({
 export const uploadToR2 = async (
   filePath: string,
   key: string
-) => {
+): Promise<string> => {
 
-  const fileStream = fs.createReadStream(filePath);
+  try {
 
-  /* detect content type automatically */
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-  let contentType = "application/octet-stream";
+    const fileStream = fs.createReadStream(filePath);
 
-  const ext = path.extname(filePath);
+    /* detect content type */
 
-  if (ext === ".mp4") contentType = "video/mp4";
-  if (ext === ".mp3") contentType = "audio/mpeg";
-  if (ext === ".json") contentType = "application/json";
+    let contentType = "application/octet-stream";
 
-  await r2.send(
-    new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET,
-      Key: key,
-      Body: fileStream,
-      ContentType: contentType,
-    })
-  );
+    const ext = path.extname(filePath).toLowerCase();
 
-  return `${process.env.R2_PUBLIC_URL}/${key}`;
+    if (ext === ".mp4") contentType = "video/mp4";
+    else if (ext === ".mp3") contentType = "audio/mpeg";
+    else if (ext === ".json") contentType = "application/json";
+
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET,
+        Key: key,
+        Body: fileStream,
+        ContentType: contentType,
+      })
+    );
+
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+    return publicUrl;
+
+  } catch (err) {
+
+    console.error("R2 Upload Error:", err);
+
+    throw new Error("Failed to upload file to R2");
+
+  }
+
 };

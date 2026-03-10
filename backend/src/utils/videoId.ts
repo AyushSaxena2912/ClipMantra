@@ -4,38 +4,51 @@ export function extractVideoId(url: string): string | null {
 
     const parsed = new URL(url);
 
-    /* youtube.com/watch?v= */
+    const hostname = parsed.hostname.replace("www.", "");
 
-    if (parsed.hostname.includes("youtube.com")) {
+    /* youtube.com links */
+
+    if (
+      hostname.includes("youtube.com") ||
+      hostname.includes("m.youtube.com")
+    ) {
+
+      /* watch?v= */
 
       const v = parsed.searchParams.get("v");
       if (v) return v;
 
+      const parts = parsed.pathname.split("/").filter(Boolean);
+
       /* shorts */
 
-      const parts = parsed.pathname.split("/");
-      if (parts.includes("shorts")) {
-        return parts[parts.indexOf("shorts") + 1] || null;
+      if (parts[0] === "shorts") {
+        return parts[1] || null;
       }
 
       /* embed */
 
-      if (parts.includes("embed")) {
-        return parts[parts.indexOf("embed") + 1] || null;
+      if (parts[0] === "embed") {
+        return parts[1] || null;
       }
 
     }
 
-    /* youtu.be */
+    /* youtu.be short link */
 
-    if (parsed.hostname.includes("youtu.be")) {
-      return parsed.pathname.replace("/", "");
+    if (hostname.includes("youtu.be")) {
+
+      const id = parsed.pathname.replace("/", "");
+
+      return id || null;
     }
 
     return null;
 
   } catch {
+
     return null;
+
   }
 
 }
