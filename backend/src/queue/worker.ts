@@ -1,13 +1,14 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
+import https from "https";
+
 import { redis } from "./redis";
 import { pool } from "../db/pool";
 import { detectHighlightsWithGemini } from "../ai/gemini";
 import { getVideoDownloadUrl } from "../utils/youtube";
 import { extractVideoId } from "../utils/videoId";
 import { uploadToR2 } from "../utils/r2";
-import https from "https";
 
 const execAsync = promisify(exec);
 const role = process.argv[2];
@@ -46,8 +47,48 @@ const ensureFolders = () => {
   });
 };
 
+const downloadFile = (url: string, path: string) => {
+  return new Promise((resolve, reject) => {
+
+    const download = (downloadUrl: string) => {
+
+      https.get(downloadUrl, (res) => {
+
+        // handle redirects
+        if (res.statusCode === 301 || res.statusCode === 302) {
+          if (res.headers.location) {
+            return download(res.headers.location);
+          }
+        }
+
+        if (res.statusCode !== 200) {
+          reject(new Error(`Download failed: ${res.statusCode}`));
+          return;
+        }
+
+        const file = fs.createWriteStream(path);
+
+        res.pipe(file);
+
+        file.on("finish", () => {
+          file.close();
+          resolve(true);
+        });
+
+        file.on("error", reject);
+
+      }).on("error", reject);
+
+    };
+
+    download(url);
+
+  });
+};
+
 const startWorker = async () => {
   console.log(`Worker started for role: ${role}`);
+
   ensureFolders();
 
   const queueName = `queue:${role}`;
@@ -56,10 +97,12 @@ const startWorker = async () => {
     let jobId: string | null = null;
 
     try {
+
       const job = await redis.brpop(queueName, 5);
       if (!job) continue;
 
       jobId = job[1];
+
       log(jobId, "Job received.");
 
       const result = await pool.query(
@@ -73,6 +116,7 @@ const startWorker = async () => {
       /* ------------ DOWNLOAD ROLE ------------ */
 
       if (role === "download") {
+
         await pool.query(
           `UPDATE jobs SET status = 'downloading' WHERE id = $1`,
           [jobId]
@@ -90,18 +134,13 @@ const startWorker = async () => {
 
         const videoPath = `storage/videos/${jobId}.mp4`;
 
-        await new Promise((resolve, reject) => {
-          const file = fs.createWriteStream(videoPath);
+        await downloadFile(videoUrl, videoPath);
 
-          https.get(videoUrl, (res) => {
-            res.pipe(file);
+        const stats = fs.statSync(videoPath);
 
-            file.on("finish", () => {
-              file.close();
-              resolve(true);
-            });
-          }).on("error", reject);
-        });
+        if (!stats || stats.size < 100000) {
+          throw new Error("Downloaded video file invalid");
+        }
 
         const audioPath = `storage/audio/${jobId}.mp3`;
 
@@ -122,6 +161,7 @@ const startWorker = async () => {
       /* ------------ TRANSCRIBE ROLE ------------ */
 
       if (role === "transcribe") {
+
         await pool.query(
           `UPDATE jobs SET status = 'transcribing' WHERE id = $1`,
           [jobId]
@@ -141,12 +181,14 @@ const startWorker = async () => {
         );
 
         await redis.lpush("queue:render", jobId);
+
         log(jobId, "Moved to render queue.");
       }
 
       /* ------------ RENDER ROLE ------------ */
 
       if (role === "render") {
+
         await pool.query(
           `UPDATE jobs SET status = 'rendering' WHERE id = $1`,
           [jobId]
@@ -160,6 +202,7 @@ const startWorker = async () => {
         );
 
         const transcriptJson = JSON.parse(transcriptRaw);
+
         const transcriptText: string = transcriptJson.text;
 
         const clipCount =
@@ -171,37 +214,46 @@ const startWorker = async () => {
         let highlights: Highlight[] = [];
 
         try {
+
           const parsed = await detectHighlightsWithGemini(
             transcriptText,
             clipCount
           );
 
           if (Array.isArray(parsed)) {
+
             highlights = parsed.filter(
               (clip: any) =>
                 typeof clip.start === "number" &&
                 typeof clip.end === "number" &&
                 clip.end > clip.start
             );
+
           }
+
         } catch (e) {
+
           log(jobId, "Gemini error.");
+
         }
 
         highlights = highlights.slice(0, clipCount);
 
         const highlightsPath = `storage/highlights/${jobId}.json`;
+
         fs.writeFileSync(
           highlightsPath,
           JSON.stringify(highlights, null, 2)
         );
 
         const clipsDir = `storage/clips/${jobId}`;
+
         fs.mkdirSync(clipsDir, { recursive: true });
 
         const generatedClips: string[] = [];
 
         for (let i = 0; i < highlights.length; i++) {
+
           const outputClipPath = `${clipsDir}/clip_${i + 1}.mp4`;
 
           await execAsync(
@@ -239,17 +291,22 @@ const startWorker = async () => {
       }
 
     } catch (err) {
+
       console.error(`[${role}] Worker error for job ${jobId}`, err);
 
       if (jobId) {
+
         await pool.query(
           `UPDATE jobs SET status = 'failed' WHERE id = $1`,
           [jobId]
         );
 
         await publishStatus(jobId, "failed");
+
       }
+
     }
+
   }
 };
 
