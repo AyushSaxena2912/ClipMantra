@@ -89,11 +89,7 @@ const startWorker = async () => {
 
         const videoId = extractVideoId(jobData.url);
 
-        if (!videoId) {
-          throw new Error("Invalid YouTube URL");
-        }
-
-        /* FIXED PART */
+        if (!videoId) throw new Error("Invalid YouTube URL");
 
         const videoDownloadUrl = await getVideoDownloadUrl(videoId);
 
@@ -121,9 +117,8 @@ const startWorker = async () => {
 
         const stats = fs.statSync(videoPath);
 
-        if (!stats || stats.size < 100000) {
+        if (!stats || stats.size < 100000)
           throw new Error("Downloaded video file invalid");
-        }
 
         const audioPath = `storage/audio/${jobId}.mp3`;
 
@@ -131,11 +126,8 @@ const startWorker = async () => {
           `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
         );
 
-        const videoKey = `videos/${jobId}.mp4`;
-        const videoUrlR2 = await uploadToR2(videoPath, videoKey);
-
-        const audioKey = `audio/${jobId}.mp3`;
-        const audioUrl = await uploadToR2(audioPath, audioKey);
+        const videoUrlR2 = await uploadToR2(videoPath, `videos/${jobId}.mp4`);
+        const audioUrl = await uploadToR2(audioPath, `audio/${jobId}.mp3`);
 
         await pool.query(
           `UPDATE jobs SET video_path = $1, audio_path = $2 WHERE id = $3`,
@@ -159,7 +151,6 @@ const startWorker = async () => {
         await publishStatus(jobId, "transcribing");
 
         const transcriptPath = `storage/transcripts/${jobId}.json`;
-
         const localAudioPath = `storage/audio/${jobId}.mp3`;
 
         const response = await axios({
@@ -181,9 +172,16 @@ const startWorker = async () => {
           `python3 scripts/transcribe.py "${localAudioPath}" "${transcriptPath}"`
         );
 
+        /* upload transcript to R2 */
+
+        const transcriptUrl = await uploadToR2(
+          transcriptPath,
+          `transcripts/${jobId}.json`
+        );
+
         await pool.query(
           `UPDATE jobs SET transcript_path = $1 WHERE id = $2`,
-          [transcriptPath, jobId]
+          [transcriptUrl, jobId]
         );
 
         await redis.lpush("queue:render", jobId);
@@ -203,6 +201,9 @@ const startWorker = async () => {
         await publishStatus(jobId, "rendering");
 
         const localVideoPath = `storage/videos/${jobId}.mp4`;
+        const localTranscriptPath = `storage/transcripts/${jobId}.json`;
+
+        /* download video */
 
         const videoResponse = await axios({
           url: jobData.video_path,
@@ -219,11 +220,24 @@ const startWorker = async () => {
           videoWriter.on("error", reject);
         });
 
-        const transcriptRaw = fs.readFileSync(
-          jobData.transcript_path,
-          "utf-8"
-        );
+        /* download transcript */
 
+        const transcriptResponse = await axios({
+          url: jobData.transcript_path,
+          method: "GET",
+          responseType: "stream",
+        });
+
+        const transcriptWriter = fs.createWriteStream(localTranscriptPath);
+
+        transcriptResponse.data.pipe(transcriptWriter);
+
+        await new Promise((resolve, reject) => {
+          transcriptWriter.on("finish", resolve);
+          transcriptWriter.on("error", reject);
+        });
+
+        const transcriptRaw = fs.readFileSync(localTranscriptPath, "utf-8");
         const transcriptJson = JSON.parse(transcriptRaw);
 
         const transcriptText: string = transcriptJson.text;
@@ -254,23 +268,13 @@ const startWorker = async () => {
 
           }
 
-        } catch (e) {
-
+        } catch {
           log(jobId, "Gemini error.");
-
         }
 
         highlights = highlights.slice(0, clipCount);
 
-        const highlightsPath = `storage/highlights/${jobId}.json`;
-
-        fs.writeFileSync(
-          highlightsPath,
-          JSON.stringify(highlights, null, 2)
-        );
-
         const clipsDir = `storage/clips/${jobId}`;
-
         fs.mkdirSync(clipsDir, { recursive: true });
 
         const generatedClips: string[] = [];
@@ -285,9 +289,10 @@ const startWorker = async () => {
             } -c:v libx264 -c:a aac -movflags +faststart "${outputClipPath}" -y`
           );
 
-          const key = `clips/${jobId}/clip_${i + 1}.mp4`;
-
-          const publicUrl = await uploadToR2(outputClipPath, key);
+          const publicUrl = await uploadToR2(
+            outputClipPath,
+            `clips/${jobId}/clip_${i + 1}.mp4`
+          );
 
           generatedClips.push(publicUrl);
 
@@ -297,15 +302,10 @@ const startWorker = async () => {
         await pool.query(
           `UPDATE jobs
            SET status = 'completed',
-               highlights_path = $1,
-               clips_path = $2,
+               clips_path = $1,
                completed_at = NOW()
-           WHERE id = $3`,
-          [
-            highlightsPath,
-            JSON.stringify(generatedClips),
-            jobId,
-          ]
+           WHERE id = $2`,
+          [JSON.stringify(generatedClips), jobId]
         );
 
         await publishStatus(jobId, "completed");
