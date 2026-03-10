@@ -29,7 +29,7 @@ Cleanup Worker  →  Files auto-deleted 24hrs after completion
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -49,7 +49,7 @@ Cleanup Worker  →  Files auto-deleted 24hrs after completion
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── src/                            # Backend (TypeScript)
