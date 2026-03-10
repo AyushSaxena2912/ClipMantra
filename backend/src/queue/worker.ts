@@ -93,10 +93,9 @@ const startWorker = async () => {
           throw new Error("Invalid YouTube URL");
         }
 
-        const { videoId: id, itag } = await getVideoDownloadUrl(videoId);
+        /* FIXED PART */
 
-        const videoDownloadUrl =
-        `https://youtube-media-downloader.p.rapidapi.com/v2/video/download?videoId=${id}&itag=${itag}`;
+        const videoDownloadUrl = await getVideoDownloadUrl(videoId);
 
         const videoPath = `storage/videos/${jobId}.mp4`;
 
@@ -105,8 +104,9 @@ const startWorker = async () => {
           url: videoDownloadUrl,
           responseType: "stream",
           headers: {
-            "X-RapidAPI-Key": process.env.RAPID_API_KEY,
-            "X-RapidAPI-Host": "youtube-media-downloader.p.rapidapi.com"
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+            Referer: "https://www.youtube.com/"
           }
         });
 

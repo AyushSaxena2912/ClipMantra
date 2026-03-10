@@ -4,6 +4,10 @@ export async function getVideoDownloadUrl(videoId: string) {
 
   try {
 
+    if (!videoId) {
+      throw new Error("VideoId missing");
+    }
+
     const response = await axios.get(
       "https://youtube-media-downloader.p.rapidapi.com/v2/video/details",
       {
@@ -21,7 +25,7 @@ export async function getVideoDownloadUrl(videoId: string) {
       throw new Error("No video streams found");
     }
 
-    /* pick stream with audio */
+    /* filter streams that actually have audio + url */
 
     const streams = data.videos.items.filter(
       (v: any) => v.hasAudio && v.url
@@ -31,17 +35,24 @@ export async function getVideoDownloadUrl(videoId: string) {
       throw new Error("No stream with audio found");
     }
 
-    /* pick best quality */
+    /* choose best quality */
 
     const video = streams.sort(
       (a: any, b: any) => (b.height || 0) - (a.height || 0)
     )[0];
 
+    if (!video?.url) {
+      throw new Error("Video URL missing");
+    }
+
     return video.url;
 
   } catch (err: any) {
 
-    console.error("RapidAPI error:", err?.response?.data || err.message);
+    console.error(
+      "RapidAPI error:",
+      err?.response?.data || err.message
+    );
 
     throw new Error("Failed to fetch video download URL");
 
