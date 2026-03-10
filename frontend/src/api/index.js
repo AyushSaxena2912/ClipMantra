@@ -1,4 +1,6 @@
-export const API_BASE = "https://clipmantra-backend-production.up.railway.app/api";
+//export const API_BASE = "https://clipmantra-backend-production.up.railway.app/api";
+
+export const API_BASE = import.meta.env.VITE_API_BASE;
 
 export const getToken = () => localStorage.getItem("clipify_token");
 export const saveToken = (t) => localStorage.setItem("clipify_token", t);
