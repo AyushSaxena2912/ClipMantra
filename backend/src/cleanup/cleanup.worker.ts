@@ -8,10 +8,8 @@ const STORAGE_ROOT = path.resolve(process.cwd(), "storage");
 // const EXPIRY_TIME =  * 60 * 1000;
 const EXPIRY_TIME = 24 * 60 * 60 * 1000;
 
-/* ---------------------------- */
-/* SAFE DELETE HELPER           */
-/* ---------------------------- */
 
+// SAFE DELETE HELPER 
 const deleteIfExists = (absolutePath: string) => {
   try {
     if (fs.existsSync(absolutePath)) {
@@ -30,10 +28,8 @@ const deleteIfExists = (absolutePath: string) => {
   }
 };
 
-/* ---------------------------- */
-/* CLEANUP LOGIC                */
-/* ---------------------------- */
 
+// CLEANUP LOGIC                
 const runCleanup = async () => {
   console.log("Running cleanup check...");
 
@@ -85,10 +81,8 @@ const runCleanup = async () => {
   }
 };
 
-/* ---------------------------- */
-/* START WORKER                 */
-/* ---------------------------- */
 
+// START WORKER                 
 export const startCleanupWorker = () => {
   console.log("Cleanup worker started (15 min test mode)");
 

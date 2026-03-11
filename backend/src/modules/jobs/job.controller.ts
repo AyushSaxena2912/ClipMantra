@@ -3,6 +3,7 @@ import Redis from "ioredis";
 import { checkJobRateLimit } from "../../utils/jobRateLimiter";
 import { createJob, getJobById, getAllJobs} from "./job.service";
 import { AuthRequest } from "../auth/auth.middleware";
+
 // CREATE JOB 
 export const handleCreateJob = async (
 req: AuthRequest,
@@ -48,6 +49,7 @@ message: "Internal server error"
     });
   }
 };
+
 //  GET SINGLE JOB  
 export const handleGetJob = async (
 req: AuthRequest,
@@ -81,6 +83,7 @@ message: "Internal server error"
     });
   }
 };
+
 // GET ALL JOBS  
 export const handleGetAllJobs = async (
 req: AuthRequest,
@@ -108,6 +111,7 @@ return res.status(500).json({
     });
   }
 };
+
 // SSE STREAM (REAL-TIME) 
 export const handleJobStream = async (
   req: AuthRequest,
@@ -130,6 +134,7 @@ if (!userId) {
   }
 }
 const { id } = req.params;
+
 // SSE headers
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");

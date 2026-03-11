@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-/* --------------------------- */
-/* JWT PAYLOAD TYPE            */
-/* --------------------------- */
+
+// JWT PAYLOAD TYPE            
 export interface JwtPayload {
   userId: string;
   email: string;
@@ -11,16 +10,14 @@ export interface JwtPayload {
   exp?: number;
 }
 
-/* --------------------------- */
-/* EXTENDED REQUEST TYPE       */
-/* --------------------------- */
+
+// EXTENDED REQUEST TYPE       
 export interface AuthRequest extends Request {
   user?: JwtPayload;
 }
 
-/* --------------------------- */
-/* AUTH MIDDLEWARE             */
-/* --------------------------- */
+
+// AUTH MIDDLEWARE             
 export const authenticate = (
   req: AuthRequest,
   res: Response,

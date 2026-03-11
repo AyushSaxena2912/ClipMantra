@@ -1,23 +1,17 @@
 import Redis from "ioredis";
 
-/*
-  Main Redis client
-*/
+// Main Redis client
 export const redis = new Redis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
 });
 
-/*
-  Separate Redis client for Pub/Sub
-*/
+// Separate Redis client for Pub/Sub
 export const redisSubscriber = new Redis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
 });
 
-/* ----------------------------- */
-/* CONNECTION LOGGING            */
-/* ----------------------------- */
 
+// CONNECTION LOGGING
 redis.on("connect", () => {
   console.log("Redis connected (main client)");
 });

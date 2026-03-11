@@ -4,9 +4,8 @@ import authRoutes from "./modules/auth/auth.routes";
 import jobRoutes from "./modules/jobs/job.routes";
 import path from "path";
 const app = express();
-/* -------------------- */
-/*   CORS CONFIG - FIX  */
-/* -------------------- */
+
+// CORS CONFIG 
 app.use(
   cors({
     origin: true,
@@ -18,29 +17,26 @@ app.use(
   })
 );
 app.options('*', cors());
-/* -------------------- */
-/*   Middlewares        */
-/* -------------------- */
+
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// ✅ Debug middleware - har request ko log karo
+// Debug middleware - har request ko log karo
 app.use((req, res, next) => {
   console.log(`📨 ${req.method} ${req.url}`);
   console.log('Origin:', req.headers.origin);
   next();
 });
-/* -------------------- */
-/*   Routes             */
-/* -------------------- */
+
+// Routes            
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use(
   "/storage",
   express.static(path.resolve(process.cwd(), "storage"))
 );
-/* -------------------- */
-/*   Health Check       */
-/* -------------------- */
+
+// Health Check       
 app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -52,13 +48,9 @@ app.get("/", (_req, res) => {
 app.get("/api/test", (_req, res) => {
   res.json({ message: "API is working!" });
 });
-/* -------------------- */
-/*   404 Handler        */
-/* -------------------- */
-// app./
-/* -------------------- */
-/*   Global Error       */
-/* -------------------- */
+
+
+// Global Error 
 app.use(
   (
     err: any,
@@ -66,7 +58,7 @@ app.use(
     res: express.Response,
     _next: express.NextFunction
   ) => {
-    console.error("❌ Unhandled Error:", err.message);
+    console.error("Unhandled Error:", err.message);
     console.error(err.stack);
     res.status(err.statusCode || 500).json({
       success: false,

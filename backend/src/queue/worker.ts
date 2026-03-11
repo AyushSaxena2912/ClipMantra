@@ -76,7 +76,7 @@ const startWorker = async () => {
       const jobData = result.rows[0];
       if (!jobData) continue;
 
-      /* ================= DOWNLOAD WORKER ================= */
+      // DOWNLOAD WORKER
 
       if (role === "download") {
 
@@ -139,7 +139,7 @@ const startWorker = async () => {
         log(jobId, "Moved to transcribe queue.");
       }
 
-      /* ================= TRANSCRIBE WORKER ================= */
+      // TRANSCRIBE WORKER 
 
       if (role === "transcribe") {
 
@@ -172,7 +172,7 @@ const startWorker = async () => {
           `python3 scripts/transcribe.py "${localAudioPath}" "${transcriptPath}"`
         );
 
-        /* upload transcript to R2 */
+        // upload transcript to R2 
 
         const transcriptUrl = await uploadToR2(
           transcriptPath,
@@ -189,7 +189,7 @@ const startWorker = async () => {
         log(jobId, "Moved to render queue.");
       }
 
-      /* ================= RENDER WORKER ================= */
+      // RENDER WORKER 
 
       if (role === "render") {
 
@@ -203,7 +203,7 @@ const startWorker = async () => {
         const localVideoPath = `storage/videos/${jobId}.mp4`;
         const localTranscriptPath = `storage/transcripts/${jobId}.json`;
 
-        /* download video */
+        // download video 
 
         const videoResponse = await axios({
           url: jobData.video_path,
@@ -220,7 +220,7 @@ const startWorker = async () => {
           videoWriter.on("error", reject);
         });
 
-        /* download transcript */
+        // download transcript 
 
         const transcriptResponse = await axios({
           url: jobData.transcript_path,

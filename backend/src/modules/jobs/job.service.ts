@@ -2,9 +2,8 @@ import { pool } from "../../db/pool";
 import { v4 as uuidv4 } from "uuid";
 import { redis } from "../../queue/redis";
 
-/* --------------------------- */
-/* CREATE JOB                  */
-/* --------------------------- */
+
+// CREATE JOB
 export const createJob = async (
   userId: string,
   url: string,
@@ -28,9 +27,8 @@ export const createJob = async (
 };
 
 
-/* --------------------------- */
-/* GET SINGLE JOB              */
-/* --------------------------- */
+
+// GET SINGLE JOB         
 export const getJobById = async (
   id: string,
   userId: string
@@ -47,9 +45,8 @@ export const getJobById = async (
 };
 
 
-/* --------------------------- */
-/* GET ALL JOBS                */
-/* --------------------------- */
+
+// GET ALL JOBS 
 export const getAllJobs = async (
   userId: string
 ) => {
@@ -66,9 +63,8 @@ export const getAllJobs = async (
 };
 
 
-/* --------------------------- */
-/* UPDATE STATUS               */
-/* --------------------------- */
+
+// UPDATE STATUS          
 export const updateJobStatus = async (
   id: string,
   userId: string,
