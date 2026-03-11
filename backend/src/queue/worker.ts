@@ -99,6 +99,7 @@ const startWorker = async () => {
         // yt-dlp se video download
         await execAsync(
           `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `--extractor-args "youtube:player_client=web" ` +
           `-f "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" ` +
           `--merge-output-format mp4 ` +
           `--no-playlist ` +
@@ -114,6 +115,7 @@ const startWorker = async () => {
         // yt-dlp se audio download
         await execAsync(
           `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `--extractor-args "youtube:player_client=web" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
           `--audio-format mp3 ` +
