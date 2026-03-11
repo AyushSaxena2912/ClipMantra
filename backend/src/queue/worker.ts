@@ -6,8 +6,6 @@ import axios from "axios";
 import { redis } from "./redis";
 import { pool } from "../db/pool";
 import { detectHighlightsWithGemini } from "../ai/gemini";
-import { getVideoDownloadUrl } from "../utils/youtube";
-import { extractVideoId } from "../utils/videoId";
 import { uploadToR2 } from "../utils/r2";
 
 const execAsync = promisify(exec);
@@ -87,43 +85,43 @@ const startWorker = async () => {
 
         await publishStatus(jobId, "downloading");
 
-        const videoId = extractVideoId(jobData.url);
-
-        if (!videoId) throw new Error("Invalid YouTube URL");
-
-        const videoDownloadUrl = await getVideoDownloadUrl(videoId);
-
         const videoPath = `storage/videos/${jobId}.mp4`;
+        const audioPath = `storage/audio/${jobId}.mp3`;
 
-        const response = await axios({
-          method: "GET",
-          url: videoDownloadUrl,
-          responseType: "stream",
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-            Referer: "https://www.youtube.com/"
-          }
-        });
+        const proxyArg = process.env.YTDLP_PROXY
+          ? `--proxy "${process.env.YTDLP_PROXY}"`
+          : "";
 
-        const writer = fs.createWriteStream(videoPath);
+        const cookiesArg = process.env.YOUTUBE_COOKIES_PATH
+          ? `--cookies "${process.env.YOUTUBE_COOKIES_PATH}"`
+          : "";
 
-        response.data.pipe(writer);
-
-        await new Promise((resolve, reject) => {
-          writer.on("finish", resolve);
-          writer.on("error", reject);
-        });
+        // yt-dlp se video download
+        await execAsync(
+          `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `-f "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" ` +
+          `--merge-output-format mp4 ` +
+          `--no-playlist ` +
+          `-o "${videoPath}" ` +
+          `"${jobData.url}"`,
+          { timeout: 5 * 60 * 1000 }
+        );
 
         const stats = fs.statSync(videoPath);
-
         if (!stats || stats.size < 100000)
           throw new Error("Downloaded video file invalid");
 
-        const audioPath = `storage/audio/${jobId}.mp3`;
-
+        // yt-dlp se audio download
         await execAsync(
-          `ffmpeg -i "${videoPath}" -vn -acodec libmp3lame "${audioPath}" -y`
+          `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `-f "bestaudio/best" ` +
+          `--extract-audio ` +
+          `--audio-format mp3 ` +
+          `--audio-quality 192K ` +
+          `--no-playlist ` +
+          `-o "${audioPath}" ` +
+          `"${jobData.url}"`,
+          { timeout: 5 * 60 * 1000 }
         );
 
         const videoUrlR2 = await uploadToR2(videoPath, `videos/${jobId}.mp4`);
