@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export const sendOTPEmail = async (email: string, otp: string) => {
 
@@ -6,11 +7,12 @@ export const sendOTPEmail = async (email: string, otp: string) => {
     host: "smtp.gmail.com",
     port: 587,
     secure: false,
+    family: 4,
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
-  });
+  } as SMTPTransport.Options);
 
   await transporter.sendMail({
     from: `"ClipMantra Support" <${process.env.MAIL_USER}>`,
