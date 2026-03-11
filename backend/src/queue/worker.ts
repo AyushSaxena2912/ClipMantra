@@ -47,6 +47,17 @@ const ensureFolders = () => {
 
 const startWorker = async () => {
 
+  // Cookies setup from env (Railway pe file system nahi hota, isliye env se decode karo)
+  if (process.env.YOUTUBE_COOKIES_BASE64) {
+    const cookiesContent = Buffer.from(
+      process.env.YOUTUBE_COOKIES_BASE64,
+      "base64"
+    ).toString("utf-8");
+    fs.writeFileSync("/tmp/cookies.txt", cookiesContent);
+    process.env.YOUTUBE_COOKIES_PATH = "/tmp/cookies.txt";
+    console.log("Cookies loaded from env.");
+  }
+
   console.log(`Worker started for role: ${role}`);
 
   ensureFolders();
