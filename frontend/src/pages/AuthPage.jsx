@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api, saveToken, saveUser } from "../api";
 import Input from "../components/Input";
 
@@ -84,6 +84,7 @@ const AuthPage = ({ onLogin, toast }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmNew, setShowConfirmNew] = useState(false);
+  const emailRef = useRef(null);
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
@@ -121,6 +122,12 @@ const AuthPage = ({ onLogin, toast }) => {
       const script = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
       script?.addEventListener("load", initGoogle);
     }
+
+    // Delay focus to ensure it stays on email even after Google SDK renders
+    const timer = setTimeout(() => {
+      emailRef.current?.focus();
+    }, 500);
+    return () => clearTimeout(timer);
   }, [mode]);
 
   const submit = async () => {
@@ -206,7 +213,7 @@ const AuthPage = ({ onLogin, toast }) => {
           <div className="flex flex-col" style={{ gap: 14 }}>
             {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
             {["login", "register", "forgot", "reset"].includes(mode) && (
-              <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" autoFocus={true} />
+              <Input ref={emailRef} label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
             )}
             {mode === "reset" && <Input label="OTP Code" value={f.otp} onChange={set("otp")} placeholder="6-digit OTP" />}
 
@@ -273,7 +280,7 @@ const AuthPage = ({ onLogin, toast }) => {
                   <span style={{ color: "#444", fontSize: 11, fontFamily: "'DM Mono', monospace" }}>OR</span>
                   <div style={{ flex: 1, height: 1, background: "#1e1e2e" }} />
                 </div>
-                <div id="google-btn" style={{ display: "flex", justifyContent: "center" }} />
+                <div id="google-btn" style={{ display: "flex", justifyContent: "center", outline: "none" }} />
               </>
             )}
           </div>

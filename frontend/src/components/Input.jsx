@@ -1,4 +1,6 @@
-const Input = ({ label, type = "text", value, onChange, placeholder, autoFocus }) => (
+import { forwardRef } from "react";
+
+const Input = forwardRef(({ label, type = "text", value, onChange, placeholder }, ref) => (
   <div>
     <label style={{
       display: "block", color: "#555", fontSize: 11,
@@ -8,11 +10,11 @@ const Input = ({ label, type = "text", value, onChange, placeholder, autoFocus }
       {label}
     </label>
     <input
+      ref={ref}
       type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      autoFocus={autoFocus}
       style={{
         width: "100%", padding: "12px 14px",
         background: "var(--bg-input)", border: "1px solid var(--border-color)",
@@ -24,6 +26,7 @@ const Input = ({ label, type = "text", value, onChange, placeholder, autoFocus }
       onBlur={(e) => (e.target.style.borderColor = "var(--border-color)")}
     />
   </div>
-);
+));
 
+Input.displayName = "Input";
 export default Input;
