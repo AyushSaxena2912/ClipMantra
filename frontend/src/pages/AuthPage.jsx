@@ -109,17 +109,6 @@ const AuthPage = ({ onLogin, toast }) => {
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleGoogleLogin,
         });
-        // Render hidden Google button for OAuth flow
-        window.google.accounts.id.renderButton(
-          document.getElementById("google-btn-hidden"),
-          {
-            theme: "filled_black",
-            size: "large",
-            width: 300,
-            text: "continue_with",
-            shape: "rectangular"
-          }
-        );
       }
     };
 
@@ -138,9 +127,22 @@ const AuthPage = ({ onLogin, toast }) => {
   }, [mode]);
 
   const handleCustomGoogleClick = () => {
-    const hiddenBtn = document.querySelector("#google-btn-hidden div[role='button']")
-      || document.querySelector("#google-btn-hidden iframe");
-    if (hiddenBtn) hiddenBtn.click();
+    if (window.google) {
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Fallback: use popup mode via oauth2
+          const client = window.google.accounts.oauth2.initCodeClient({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            scope: "email profile",
+            ux_mode: "popup",
+            callback: (response) => {
+              handleGoogleLogin({ credential: response.code });
+            },
+          });
+          client.requestCode();
+        }
+      });
+    }
   };
 
   const submit = async () => {
@@ -293,7 +295,6 @@ const AuthPage = ({ onLogin, toast }) => {
                     <span style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontWeight: 600 }}>OR</span>
                     <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
                   </div>
-                  <div id="google-btn-hidden" style={{ position: "absolute", opacity: 0, pointerEvents: "none", height: 0, overflow: "hidden" }} />
                   <button
                     type="button"
                     onClick={handleCustomGoogleClick}
