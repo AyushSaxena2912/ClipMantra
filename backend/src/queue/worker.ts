@@ -12,6 +12,7 @@ const execAsync = promisify(exec);
 const role = process.argv[2];
 
 const ytDlpCmd = process.env.YTDLP_PATH || "/usr/local/bin/yt-dlp";
+
 if (!["download", "transcribe", "render"].includes(role)) {
   console.error("Provide worker role: download | transcribe | render");
   process.exit(1);
@@ -48,14 +49,15 @@ const ensureFolders = () => {
 
 const startWorker = async () => {
 
-  // Cookies setup from env (Railway pe file system nahi hota, isliye env se decode karo)
   if (process.env.YOUTUBE_COOKIES_BASE64) {
     const cookiesContent = Buffer.from(
       process.env.YOUTUBE_COOKIES_BASE64,
       "base64"
     ).toString("utf-8");
+
     fs.writeFileSync("/tmp/cookies.txt", cookiesContent);
     process.env.YOUTUBE_COOKIES_PATH = "/tmp/cookies.txt";
+
     console.log("Cookies loaded from env.");
   }
 
@@ -108,27 +110,33 @@ const startWorker = async () => {
           ? `--cookies "${process.env.YOUTUBE_COOKIES_PATH}"`
           : "";
 
-     // yt-dlp se video download
-await execAsync(
-  `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-  `--extractor-args "youtube:player_client=android" ` +
-  `--retries 10 --fragment-retries 10 ` +
-  `-f "bv*[height<=1080]+ba/best" ` +
-  `--merge-output-format mp4 ` +
-  `--no-playlist ` +
-  `-o "${videoPath}" ` +
-  `"${jobData.url}"`,
-  { timeout: 5 * 60 * 1000 }
-);
+        // VIDEO DOWNLOAD
 
-        const stats = fs.statSync(videoPath);
-        if (!stats || stats.size < 100000)
-          throw new Error("Downloaded video file invalid");
-
-        // yt-dlp se audio download
         await execAsync(
           `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=android" ` +
+          `--extractor-args "youtube:player_client=web" ` +
+          `--add-header "User-Agent: Mozilla/5.0" ` +
+          `--retries 10 --fragment-retries 10 ` +
+          `-f "bv*[height<=1080]+ba/best" ` +
+          `--merge-output-format mp4 ` +
+          `--no-playlist ` +
+          `-o "${videoPath}" ` +
+          `"${jobData.url}"`,
+          { timeout: 5 * 60 * 1000 }
+        );
+
+        const stats = fs.statSync(videoPath);
+
+        if (!stats || stats.size < 100000) {
+          throw new Error("Downloaded video file invalid");
+        }
+
+        // AUDIO DOWNLOAD
+
+        await execAsync(
+          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
+          `--extractor-args "youtube:player_client=web" ` +
+          `--add-header "User-Agent: Mozilla/5.0" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
           `--audio-format mp3 ` +
@@ -152,7 +160,7 @@ await execAsync(
         log(jobId, "Moved to transcribe queue.");
       }
 
-      // TRANSCRIBE WORKER 
+      // TRANSCRIBE WORKER
 
       if (role === "transcribe") {
 
@@ -185,8 +193,6 @@ await execAsync(
           `python3 scripts/transcribe.py "${localAudioPath}" "${transcriptPath}"`
         );
 
-        // upload transcript to R2 
-
         const transcriptUrl = await uploadToR2(
           transcriptPath,
           `transcripts/${jobId}.json`
@@ -202,7 +208,7 @@ await execAsync(
         log(jobId, "Moved to render queue.");
       }
 
-      // RENDER WORKER 
+      // RENDER WORKER
 
       if (role === "render") {
 
@@ -215,8 +221,6 @@ await execAsync(
 
         const localVideoPath = `storage/videos/${jobId}.mp4`;
         const localTranscriptPath = `storage/transcripts/${jobId}.json`;
-
-        // download video 
 
         const videoResponse = await axios({
           url: jobData.video_path,
@@ -232,8 +236,6 @@ await execAsync(
           videoWriter.on("finish", resolve);
           videoWriter.on("error", reject);
         });
-
-        // download transcript 
 
         const transcriptResponse = await axios({
           url: jobData.transcript_path,
