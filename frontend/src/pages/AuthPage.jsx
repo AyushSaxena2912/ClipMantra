@@ -21,7 +21,7 @@ const EyeIcon = ({ show }) => (
 
 const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-    <label style={{ color: "#888", fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>
+    <label style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>
       {label}
     </label>
     <div style={{ position: "relative" }}>
@@ -33,18 +33,18 @@ const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) 
         style={{
           width: "100%",
           padding: "12px 44px 12px 14px",
-          background: "#0a0a12",
-          border: "1px solid #1e1e2e",
+          background: "var(--bg-input)",
+          border: "1px solid var(--border-color)",
           borderRadius: 10,
           color: "#fff",
-          fontSize: 14,
-          fontFamily: "'DM Mono', monospace",
+          fontSize: "var(--fs-base)",
+          fontFamily: 'var(--font-main)',
           outline: "none",
           boxSizing: "border-box",
           transition: "border 0.2s",
         }}
-        onFocus={e => e.target.style.border = "1px solid #00e599"}
-        onBlur={e => e.target.style.border = "1px solid #1e1e2e"}
+        onFocus={e => e.target.style.borderColor = "var(--primary)"}
+        onBlur={e => e.target.style.borderColor = "var(--border-color)"}
       />
       <button
         type="button"
@@ -57,7 +57,7 @@ const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) 
           background: "none",
           border: "none",
           cursor: "pointer",
-          color: show ? "#00e599" : "#444",
+          color: show ? "var(--primary)" : "var(--text-dark)",
           padding: 0,
           display: "flex",
           alignItems: "center",
@@ -71,9 +71,9 @@ const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) 
 );
 
 const linkBtn = {
-  background: "none", border: "none", color: "#555",
-  cursor: "pointer", fontSize: 13,
-  fontFamily: "'DM Mono', monospace", padding: 0,
+  background: "none", border: "none", color: "var(--text-muted)",
+  cursor: "pointer", fontSize: "var(--fs-sm)",
+  fontFamily: "'Montserrat', sans-serif", padding: 0,
 };
 
 const AuthPage = ({ onLogin, toast }) => {
@@ -111,7 +111,13 @@ const AuthPage = ({ onLogin, toast }) => {
         });
         window.google.accounts.id.renderButton(
           document.getElementById("google-btn"),
-          { theme: "filled_black", size: "large", width: 348, text: "continue_with" }
+          {
+            theme: "filled_black",
+            size: "large",
+            width: 348,
+            text: "continue_with",
+            shape: "rectangular"
+          }
         );
       }
     };
@@ -181,129 +187,132 @@ const AuthPage = ({ onLogin, toast }) => {
     }}>
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: "linear-gradient(rgba(0,229,153,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,153,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(rgba(0,229,153,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,153,0.02) 1px, transparent 1px)",
         backgroundSize: "60px 60px", pointerEvents: "none",
       }} />
       <div style={{
         position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)",
         width: 400, height: 400,
-        background: "radial-gradient(circle, rgba(0,229,153,0.08) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(0,229,153,0.05) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
 
       <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }} className="flex flex-col items-center">
-        <div className="text-center" style={{ marginBottom: 40 }}>
-          <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 8 }}>
-
-            <span className="font-syne" style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: -1 }}>ClipMantra</span>
+        <div className="text-center" style={{ marginBottom: 48 }}>
+          <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 12 }}>
+            <span className="logo-text" style={{ fontSize: "var(--fs-4xl)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em" }}>ClipMantra</span>
           </div>
-          <p style={{ color: "var(--text-dim)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>
+          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", letterSpacing: "0.15em", textTransform: "uppercase", opacity: 0.8 }}>
             AI-Powered Viral Clip Extractor
           </p>
         </div>
 
-        <div className="card" style={{ padding: "36px", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>
-            {titles[mode]}
-          </h2>
-          <p style={{ color: "var(--text-muted)", fontSize: 13, margin: "0 0 28px" }}>
-            {subtitles[mode]}
-          </p>
+        <div className="card" style={{ padding: "40px", boxShadow: "0 40px 80px rgba(0,0,0,0.6)", width: "100%" }}>
+          <div style={{ minHeight: 400, display: "flex", flexDirection: "column" }}>
+            <h2 style={{ fontSize: "var(--fs-2xl)", fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>
+              {titles[mode]}
+            </h2>
+            <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-sm)", margin: "0 0 32px", lineHeight: 1.5 }}>
+              {subtitles[mode]}
+            </p>
 
-          <div className="flex flex-col" style={{ gap: 14 }}>
-            {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
-            {["login", "register", "forgot", "reset"].includes(mode) && (
-              <Input ref={emailRef} label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
-            )}
-            {mode === "reset" && <Input label="OTP Code" value={f.otp} onChange={set("otp")} placeholder="6-digit OTP" />}
+            <div className="flex flex-col" style={{ gap: 20, flex: 1 }}>
+              {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
+              {["login", "register", "forgot", "reset"].includes(mode) && (
+                <Input ref={emailRef} label="Email Address" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
+              )}
+              {mode === "reset" && <Input label="OTP Verification Code" value={f.otp} onChange={set("otp")} placeholder="Check your email for 6-digit code" />}
 
-            {["login", "register"].includes(mode) && (
-              <PasswordInput
-                label="Password"
-                value={f.password}
-                onChange={set("password")}
-                placeholder="••••••••"
-                show={showPass}
-                onToggle={() => setShowPass(p => !p)}
-              />
-            )}
-            {mode === "register" && (
-              <PasswordInput
-                label="Confirm Password"
-                value={f.confirm}
-                onChange={set("confirm")}
-                placeholder="••••••••"
-                show={showConfirm}
-                onToggle={() => setShowConfirm(p => !p)}
-              />
-            )}
-            {mode === "reset" && (
-              <>
+              {["login", "register"].includes(mode) && (
                 <PasswordInput
-                  label="New Password"
-                  value={f.newPass}
-                  onChange={set("newPass")}
+                  label="Password"
+                  value={f.password}
+                  onChange={set("password")}
                   placeholder="••••••••"
-                  show={showNewPass}
-                  onToggle={() => setShowNewPass(p => !p)}
+                  show={showPass}
+                  onToggle={() => setShowPass(p => !p)}
                 />
+              )}
+              {mode === "register" && (
                 <PasswordInput
-                  label="Confirm New Password"
-                  value={f.confirmNew}
-                  onChange={set("confirmNew")}
+                  label="Confirm Password"
+                  value={f.confirm}
+                  onChange={set("confirm")}
                   placeholder="••••••••"
-                  show={showConfirmNew}
-                  onToggle={() => setShowConfirmNew(p => !p)}
+                  show={showConfirm}
+                  onToggle={() => setShowConfirm(p => !p)}
                 />
-              </>
-            )}
+              )}
+              {mode === "reset" && (
+                <>
+                  <PasswordInput
+                    label="New Password"
+                    value={f.newPass}
+                    onChange={set("newPass")}
+                    placeholder="••••••••"
+                    show={showNewPass}
+                    onToggle={() => setShowNewPass(p => !p)}
+                  />
+                  <PasswordInput
+                    label="Confirm New Password"
+                    value={f.confirmNew}
+                    onChange={set("confirmNew")}
+                    placeholder="••••••••"
+                    show={showConfirmNew}
+                    onToggle={() => setShowConfirmNew(p => !p)}
+                  />
+                </>
+              )}
 
-            {mode === "register" && (
-              <p style={{ color: "#444", fontSize: 11, fontFamily: "'DM Mono', monospace" }}>
-                Must be 8-15 chars with uppercase, lowercase, number & special char (@$!%*?&)
-              </p>
-            )}
+              {mode === "register" && (
+                <p style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontFamily: "var(--font-main)", lineHeight: 1.4 }}>
+                  Password must be 8-15 characters with uppercase, lowercase, number and special characters.
+                </p>
+              )}
 
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="btn-primary"
-              style={{ marginTop: 6, width: "100%" }}
-            >
-              {loading ? "Please wait..." : btnLabels[mode]}
-            </button>
+              <button
+                onClick={submit}
+                disabled={loading}
+                className="btn-primary"
+                style={{ marginTop: "auto", width: "100%", padding: "14px" }}
+              >
+                {loading ? "Please wait..." : btnLabels[mode]}
+              </button>
 
-            {["login", "register"].includes(mode) && (
-              <>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0" }}>
-                  <div style={{ flex: 1, height: 1, background: "#1e1e2e" }} />
-                  <span style={{ color: "#444", fontSize: 11, fontFamily: "'DM Mono', monospace" }}>OR</span>
-                  <div style={{ flex: 1, height: 1, background: "#1e1e2e" }} />
-                </div>
-                <div id="google-btn" style={{ display: "flex", justifyContent: "center", outline: "none" }} />
-              </>
-            )}
-          </div>
+              {["login", "register"].includes(mode) && (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "10px 0" }}>
+                    <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
+                    <span style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontWeight: 600 }}>OR</span>
+                    <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
+                  </div>
+                  <div id="google-btn" style={{ display: "flex", justifyContent: "center", outline: "none" }} />
+                </>
+              )}
+            </div>
 
-          <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
-            {mode === "login" && (
-              <>
-                <button onClick={() => setMode("forgot")} style={linkBtn}>Forgot password?</button>
-                <span style={{ color: "#333", fontSize: 12 }}>
-                  Don't have an account?{" "}
-                  <button onClick={() => setMode("register")} style={{ ...linkBtn, color: "#00e599" }}>Sign up</button>
+            <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+              {mode === "login" && (
+                <>
+                  <button onClick={() => setMode("forgot")} style={linkBtn}>Forgot password?</button>
+                  <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)" }}>
+                    Don't have an account?{" "}
+                    <button onClick={() => setMode("register")} style={{ ...linkBtn, color: "var(--primary)", fontWeight: 600 }}>Sign up</button>
+                  </span>
+                </>
+              )}
+              {mode === "register" && (
+                <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)" }}>
+                  Already have an account?{" "}
+                  <button onClick={() => setMode("login")} style={{ ...linkBtn, color: "var(--primary)", fontWeight: 600 }}>Sign in</button>
                 </span>
-              </>
-            )}
-            {mode === "register" && (
-              <span style={{ color: "#333", fontSize: 12 }}>
-                Already have an account?{" "}
-                <button onClick={() => setMode("login")} style={{ ...linkBtn, color: "#00e599" }}>Sign in</button>
-              </span>
-            )}
-            {["forgot", "reset"].includes(mode) && (
-              <button onClick={() => setMode("login")} style={linkBtn}>← Back to login</button>
-            )}
+              )}
+              {["forgot", "reset"].includes(mode) && (
+                <button onClick={() => setMode("login")} style={{ ...linkBtn, fontWeight: 500 }}>
+                  ← Back to login
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

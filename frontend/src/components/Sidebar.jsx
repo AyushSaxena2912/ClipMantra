@@ -51,9 +51,9 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
         zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span className="font-syne" style={{ fontSize: 18, fontWeight: 800 }}>ClipMantra</span>
+          <span className="logo-text" style={{ fontSize: "var(--fs-xl)", fontWeight: 800 }}>ClipMantra</span>
           <span style={{
-            fontSize: 10, background: '#1a1a2e', padding: '2px 8px',
+            fontSize: "var(--fs-xs)", background: '#1a1a2e', padding: '2px 8px',
             borderRadius: 4, color: 'var(--text-muted)', border: '1px solid var(--border-color)'
           }}>Free</span>
         </div>
@@ -75,7 +75,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
         left: 0,
         right: 0,
         height: 70,
-        background: "rgba(8, 8, 16, 0.95)",
+        background: "var(--bg-sidebar)",
         backdropFilter: "blur(12px)",
         borderTop: "1px solid var(--border-muted)",
         zIndex: 1000,
@@ -100,7 +100,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
             }}
           >
             <span style={{ fontSize: 24 }}>{item.icon}</span>
-            <span style={{ fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</span>
+            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</span>
           </button>
         ))}
       </div>
@@ -132,7 +132,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
           borderBottom: "1px solid var(--border-muted)",
           marginBottom: 8
         }}>
-          {!isCollapsed && <span className="font-syne" style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap' }}>ClipMantra</span>}
+          {!isCollapsed && <span className="logo-text" style={{ fontSize: "var(--fs-xl)", fontWeight: 800, whiteSpace: 'nowrap' }}>ClipMantra</span>}
           <button
             className="collapse-btn"
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -142,7 +142,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
               borderRadius: 6,
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid var(--border-color)',
-              color: 'var(--text-muted)',
+              color: 'var(--text-dim)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -151,7 +151,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-dim)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
           >
             {isCollapsed ? "→" : "←"}
           </button>
@@ -167,9 +167,9 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
             <div key={section.section}>
               {!isCollapsed && (
                 <p style={{
-                  color: 'var(--text-dim)', fontSize: 10, fontWeight: 600,
+                  color: 'var(--text-dark)', fontSize: "var(--fs-xs)", fontWeight: 600,
                   textTransform: 'uppercase', letterSpacing: 1.5,
-                  padding: '0 12px 12px'
+                  padding: '0 12px 12px', opacity: 0.8
                 }}>
                   {section.section}
                 </p>
@@ -180,12 +180,12 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
                     display: "flex", alignItems: "center", gap: 16,
                     padding: isCollapsed ? "12px 0" : "10px 14px",
                     justifyContent: isCollapsed ? "center" : "flex-start",
-                    background: page === n.id ? "rgba(0, 229, 153, 0.05)" : "transparent",
-                    border: "none",
+                    background: page === n.id ? "rgba(0, 229, 153, 0.08)" : "transparent",
+                    border: page === n.id ? "1px solid rgba(0, 229, 153, 0.3)" : "1px solid transparent",
                     borderRadius: 10,
-                    color: page === n.id ? "var(--primary)" : "var(--text-muted)",
+                    color: page === n.id ? "#fff" : "var(--text-dim)",
                     cursor: "pointer",
-                    fontSize: 14,
+                    fontSize: "var(--fs-base)",
                     textAlign: "left", transition: "all 0.2s",
                     width: '100%',
                     position: 'relative'
@@ -194,7 +194,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
                     {!isCollapsed && <span style={{ whiteSpace: 'nowrap', fontWeight: page === n.id ? 600 : 400 }}>{n.label}</span>}
                     {n.badge && !isCollapsed && (
                       <span style={{
-                        fontSize: 8, background: 'var(--primary)', color: '#000',
+                        fontSize: "var(--fs-xs)", background: 'var(--primary)', color: '#000',
                         padding: '1px 4px', borderRadius: 4, fontWeight: 700,
                         textTransform: 'uppercase', marginLeft: 'auto'
                       }}>{n.badge}</span>
@@ -240,7 +240,7 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
               {!isCollapsed && (
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <p className="font-syne" style={{
-                    color: "#fff", fontSize: 13, fontWeight: 600,
+                    color: "#fff", fontSize: "var(--fs-sm)", fontWeight: 600,
                     margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>{user?.name}</p>
                 </div>
@@ -252,12 +252,12 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
                 onClick={onLogout}
                 style={{
                   background: "transparent", border: "1px solid var(--border-muted)",
-                  borderRadius: 8, color: "var(--text-dim)", cursor: "pointer",
-                  fontSize: 11, padding: "8px", width: "100%", transition: "all 0.2s",
+                  borderRadius: 8, color: "var(--text-muted)", cursor: "pointer",
+                  fontSize: "var(--fs-xs)", padding: "8px", width: "100%", transition: "all 0.2s",
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent-red)"; e.currentTarget.style.color = "var(--accent-red)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-muted)"; e.currentTarget.style.color = "var(--text-dim)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-muted)"; e.currentTarget.style.color = "var(--text-muted)"; }}
               >
                 Sign Out
               </button>

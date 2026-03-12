@@ -17,8 +17,8 @@ const JobRow = ({ job, onClick }) => {
         cursor: "pointer", transition: "all 0.15s",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "rgba(0, 229, 153, 0.3)";
-        e.currentTarget.style.background = "rgba(13, 13, 20, 0.8)";
+        e.currentTarget.style.borderColor = "rgba(0, 229, 153, 0.2)";
+        e.currentTarget.style.background = "rgba(22, 22, 26, 0.8)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "var(--border-color)";
@@ -27,23 +27,23 @@ const JobRow = ({ job, onClick }) => {
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          color: "#fff", fontSize: 13,
+          color: "#fff", fontSize: "var(--fs-sm)",
           margin: "0 0 4px",
           overflow: "hidden", textOverflow: "ellipsis",
           whiteSpace: "nowrap", maxWidth: 400,
         }}>{job.url}</p>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <span style={{ color: "#444", fontSize: 10, fontFamily: "'DM Mono', monospace" }}>
+          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
             {timeAgo(job.created_at)}
           </span>
-          <span style={{ color: "#333", fontSize: 10 }}>·</span>
-          <span style={{ color: "#444", fontSize: 10, fontFamily: "'DM Mono', monospace" }}>
+          <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)" }}>·</span>
+          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
             {job.clip_count} clips requested
           </span>
           {job.status === "completed" && clips.length > 0 && (
             <>
-              <span style={{ color: "#333", fontSize: 10 }}>·</span>
-              <span style={{ color: "#00e599", fontSize: 10, fontFamily: "'DM Mono', monospace" }}>
+              <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)" }}>·</span>
+              <span style={{ color: "#00e599", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
                 {clips.length} clips ready
               </span>
             </>

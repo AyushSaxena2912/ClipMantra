@@ -98,10 +98,10 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
         style={{
           background: "none",
           border: "none",
-          color: "#555",
+          color: "var(--text-muted)",
           cursor: "pointer",
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 12,
+          fontFamily: 'var(--font-main)',
+          fontSize: "var(--fs-sm)",
           marginBottom: 24,
           padding: 0,
         }}
@@ -122,7 +122,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       >
         <div>
           <div className="flex items-center" style={{ gap: 12, marginBottom: 6 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: 0 }}>
+            <h1 style={{ fontSize: "var(--fs-3xl)", fontWeight: "var(--fw-extrabold)", color: "#fff", margin: 0 }}>
               Job Details
             </h1>
 
@@ -132,8 +132,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               <span
                 style={{
                   color: "#00e599",
-                  fontSize: 10,
-                  fontFamily: "'DM Mono', monospace",
+                  fontSize: "var(--fs-xs)",
+                  fontFamily: 'var(--font-main)',
                   animation: "pulse 1.5s infinite",
                 }}
               >
@@ -142,7 +142,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
             )}
           </div>
 
-          <p style={{ color: "var(--text-dim)", fontSize: 11, margin: 0, maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", margin: 0, maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {job.url}
           </p>
         </div>
@@ -159,13 +159,13 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               onClick={startStream}
               style={{
                 padding: "10px 18px",
-                background: "#0d0d14",
-                border: "1px solid #00e59944",
+                background: "#16161a",
+                border: "1px solid #00e59933",
                 borderRadius: 10,
                 color: "#00e599",
                 cursor: "pointer",
-                fontFamily: "'DM Mono', monospace",
-                fontSize: 12,
+                fontFamily: 'var(--font-main)',
+                fontSize: "var(--fs-sm)",
               }}
             >
               ↻ Watch Live
@@ -176,7 +176,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       {/* Pipeline */}
       {liveStatus !== "failed" && (
         <div className="card pipeline-card" style={{ padding: "24px 28px", marginBottom: 28 }}>
-          <p style={{ color: "var(--text-dim)", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 20px" }}>
+          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 20px" }}>
             Processing Pipeline
           </p>
 
@@ -185,7 +185,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               const done = i < currentStep || liveStatus === "completed";
               const active =
                 i === currentStep && liveStatus !== "completed";
-              const color = done ? "#00e599" : active ? "#f0a500" : "#222";
+              const color = done ? "#00e599" : active ? "var(--accent-orange)" : "#222";
 
               return (
                 <div
@@ -213,15 +213,15 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         height: 28,
                         borderRadius: "50%",
                         background: done
-                          ? "#00e59922"
+                          ? "#00e59915"
                           : active
-                            ? "#f0a50022"
+                            ? "rgba(255, 153, 0, 0.1)"
                             : "#111",
                         border: `2px solid ${color}`,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 11,
+                        fontSize: "var(--fs-xs)",
                         color,
                         boxShadow: active
                           ? `0 0 12px ${color}44`
@@ -240,10 +240,10 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         color: active
                           ? "#fff"
                           : done
-                            ? "#555"
-                            : "#333",
-                        fontSize: 9,
-                        fontFamily: "'DM Mono', monospace",
+                            ? "var(--text-muted)"
+                            : "var(--text-dim)",
+                        fontSize: "var(--fs-xs)",
+                        fontFamily: 'var(--font-main)',
                         letterSpacing: 1,
                         textTransform: "uppercase",
                         whiteSpace: "nowrap",
@@ -260,8 +260,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         flex: 1,
                         height: 2,
                         background: done
-                          ? "#00e59944"
-                          : "#1a1a2a",
+                          ? "#00e59933"
+                          : "#1a1a24",
                         margin: "0 4px",
                         marginBottom: 22,
                       }}
@@ -277,7 +277,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       {/* Video Clips */}
       {clips.length > 0 && (
         <div style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: "0 0 16px" }}>
+          <h2 style={{ fontSize: "var(--fs-lg)", fontWeight: "var(--fw-bold)", color: "#fff", margin: "0 0 16px" }}>
             Generated Clips
           </h2>
 
@@ -308,7 +308,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                   />
 
                   <div style={{ padding: "16px" }} className="flex justify-between items-center">
-                    <span className="font-syne" style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>
+                    <span className="font-syne" style={{ color: "#fff", fontSize: "var(--fs-base)", fontWeight: "var(--fw-semibold)" }}>
                       Clip {i + 1}
                     </span>
 
@@ -316,13 +316,13 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                       href={videoUrl}
                       download={`clip_${i + 1}.mp4`}
                       style={{
-                        background: "rgba(0, 229, 153, 0.1)",
+                        background: "rgba(240, 48, 80, 0.1)",
                         border: "1px solid var(--primary)",
                         borderRadius: 8,
                         color: "var(--primary)",
                         padding: "6px 14px",
-                        fontSize: 11,
-                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "var(--fs-xs)",
+                        fontFamily: "'Montserrat', sans-serif",
                         textDecoration: "none",
                         fontWeight: 600,
                         transition: 'all 0.2s'

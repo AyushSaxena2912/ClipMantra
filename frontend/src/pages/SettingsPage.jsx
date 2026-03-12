@@ -86,7 +86,7 @@ const SettingsPage = ({ user, toast, onLogout }) => {
             padding: "11px 24px", background: "transparent",
             border: "1px solid #ff3b3b44", borderRadius: 10,
             color: "#ff3b3b", cursor: "pointer",
-            fontFamily: "'DM Mono', monospace", fontSize: 13,
+            fontFamily: "'Montserrat', sans-serif", fontSize: 13,
           }}
         >
           Sign Out

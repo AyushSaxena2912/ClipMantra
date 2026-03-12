@@ -1,20 +1,21 @@
 import JobRow from "../components/JobRow";
+import JobCard from "../components/JobCard";
 
 const LoadingState = () => (
   <div style={{ padding: "60px 0", textAlign: "center" }}>
     <div style={{
       width: 32, height: 32,
-      border: "2px solid #1e1e2e", borderTopColor: "#00e599",
+      border: "2px solid #242428", borderTopColor: "#00e599",
       borderRadius: "50%", animation: "spin 0.8s linear infinite",
       margin: "0 auto 16px",
     }} />
-    <p style={{ color: "#333", fontFamily: "'DM Mono', monospace", fontSize: 12 }}>Loading...</p>
+    <p style={{ color: "#333", fontFamily: "'Montserrat', sans-serif", fontSize: 12 }}>Loading...</p>
   </div>
 );
 
 const EmptyState = () => (
   <div style={{ padding: "60px 0", textAlign: "center", border: "1px dashed #1e1e2e", borderRadius: 14 }}>
-    <p style={{ color: "#333", fontFamily: "'DM Mono', monospace", fontSize: 13 }}>No jobs yet.</p>
+    <p style={{ color: "#333", fontFamily: "'Montserrat', sans-serif", fontSize: 13 }}>No jobs yet.</p>
   </div>
 );
 
@@ -45,8 +46,12 @@ const JobsPage = ({ jobs, loading, onViewJob, onRefresh }) => (
     </div>
 
     {loading ? <LoadingState /> : jobs.length === 0 ? <EmptyState /> : (
-      <div className="flex flex-col" style={{ gap: 10 }}>
-        {jobs.map((j) => <JobRow key={j.id} job={j} onClick={() => onViewJob(j)} />)}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: 16
+      }}>
+        {jobs.map((j) => <JobCard key={j.id} job={j} onClick={() => onViewJob(j)} />)}
       </div>
     )}
   </div>

@@ -3,8 +3,8 @@ import { forwardRef } from "react";
 const Input = forwardRef(({ label, type = "text", value, onChange, placeholder }, ref) => (
   <div>
     <label style={{
-      display: "block", color: "#555", fontSize: 11,
-      fontFamily: "'DM Mono', monospace", letterSpacing: 1.5,
+      display: "block", color: "var(--text-dim)", fontSize: "var(--fs-xs)",
+      fontFamily: "var(--font-main)", letterSpacing: 1.5,
       textTransform: "uppercase", marginBottom: 6,
     }}>
       {label}
@@ -18,7 +18,7 @@ const Input = forwardRef(({ label, type = "text", value, onChange, placeholder }
       style={{
         width: "100%", padding: "12px 14px",
         background: "var(--bg-input)", border: "1px solid var(--border-color)",
-        borderRadius: 10, color: "#fff", fontSize: 14,
+        borderRadius: 10, color: "#fff", fontSize: "var(--fs-base)",
         outline: "none",
         boxSizing: "border-box", transition: "border-color 0.2s",
       }}
