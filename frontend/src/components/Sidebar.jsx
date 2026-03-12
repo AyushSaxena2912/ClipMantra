@@ -28,8 +28,17 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
     setIsOpen(false);
   };
 
+  // Flattened items for mobile bottom nav
+  const mobileItems = [
+    { id: "home", icon: "⬡", label: "Home" },
+    { id: "new-job", icon: "＋", label: "Create" },
+    { id: "jobs", icon: "≡", label: "Jobs" },
+    { id: "settings", icon: "◎", label: "Profile" },
+  ];
+
   return (
     <>
+      {/* Mobile Top Header */}
       <div className="mobile-header" style={{
         display: "none",
         padding: "16px 20px",
@@ -48,42 +57,62 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
             borderRadius: 4, color: 'var(--text-muted)', border: '1px solid var(--border-color)'
           }}>Free</span>
         </div>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          style={{ background: "none", border: "none", color: "var(--primary)", fontSize: 24, cursor: "pointer" }}
-        >
-          {isOpen ? "✕" : "☰"}
-        </button>
+        <div style={{
+          width: 32, height: 32, borderRadius: '50%',
+          background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--primary)', fontSize: 12, fontWeight: 700
+        }}>
+          {user?.name?.charAt(0).toUpperCase()}
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="mobile-bottom-nav" style={{
+        display: "none",
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 70,
+        background: "rgba(8, 8, 16, 0.95)",
+        backdropFilter: "blur(12px)",
+        borderTop: "1px solid var(--border-muted)",
+        zIndex: 1000,
+        padding: "0 10px",
+        justifyContent: "space-around",
+        alignItems: "center"
+      }}>
+        {mobileItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setPage(item.id)}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 4,
+              background: "none",
+              border: "none",
+              color: page === item.id ? "var(--primary)" : "var(--text-muted)",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+          >
+            <span style={{ fontSize: 24 }}>{item.icon}</span>
+            <span style={{ fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</span>
+          </button>
+        ))}
       </div>
 
       <style>{`
         @media (max-width: 768px) {
           .mobile-header { display: flex !important; }
-          .sidebar-container {
-            position: fixed;
-            top: 60px;
-            left: ${isOpen ? "0" : "-100%"};
-            width: 280px !important;
-            height: calc(100vh - 60px);
-            z-index: 90;
-            transition: left 0.3s ease;
-          }
-          .sidebar-overlay {
-            display: ${isOpen ? "block" : "none"};
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 80;
-          }
-          .collapse-btn { display: none !important; }
+          .mobile-bottom-nav { display: flex !important; }
+          .sidebar-container { display: none !important; }
+          .content-area { padding-bottom: 90px !important; }
         }
       `}</style>
-
-      {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
 
       <div className="sidebar-container" style={{
         width: isCollapsed ? 80 : 260,
