@@ -11,6 +11,7 @@ import { uploadToR2 } from "../utils/r2";
 const execAsync = promisify(exec);
 const role = process.argv[2];
 
+const ytDlpCmd = process.env.YTDLP_PATH || "/usr/local/bin/yt-dlp";
 if (!["download", "transcribe", "render"].includes(role)) {
   console.error("Provide worker role: download | transcribe | render");
   process.exit(1);
@@ -109,7 +110,7 @@ const startWorker = async () => {
 
         // yt-dlp se video download
         await execAsync(
-          `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
           `--extractor-args "youtube:player_client=web" ` +
           `-f "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" ` +
           `--merge-output-format mp4 ` +
@@ -125,7 +126,7 @@ const startWorker = async () => {
 
         // yt-dlp se audio download
         await execAsync(
-          `yt-dlp ${proxyArg} ${cookiesArg} ` +
+          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
           `--extractor-args "youtube:player_client=web" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
