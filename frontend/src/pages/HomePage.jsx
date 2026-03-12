@@ -39,7 +39,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-md">
+        <div className="grid grid-cols-4 gap-md stats-container">
           {[
             { label: "Total Jobs", value: stats.total, color: "var(--text-main)", glow: "rgba(255,255,255,0.2)" },
             { label: "Completed", value: stats.completed, color: "var(--primary)", glow: "rgba(0, 229, 153, 0.3)" },
@@ -50,7 +50,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
               <p style={{ color: "var(--text-dim)", fontSize: 10, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 12px" }}>
                 {s.label}
               </p>
-              <p className="font-syne" style={{ color: s.color, fontSize: 40, fontWeight: 800, margin: "0 0 12px", lineHeight: 1 }}>
+              <p className="font-syne stat-value" style={{ color: s.color, fontSize: 40, fontWeight: 800, margin: "0 0 12px", lineHeight: 1 }}>
                 {s.value}
               </p>
               {/* Visual indicator bar */}
@@ -62,7 +62,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
         </div>
 
         {/* Quick Create Banner */}
-        <div className="card stat-card" style={{
+        <div className="card stat-card quick-create-banner" style={{
           background: "linear-gradient(135deg, rgba(0, 229, 153, 0.05), rgba(5, 15, 10, 0.4))",
           border: "1px solid rgba(0, 229, 153, 0.15)",
           padding: "40px",
@@ -75,10 +75,10 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
             pointerEvents: "none",
           }} />
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px" }}>
+            <h2 className="font-syne banner-title" style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px" }}>
               Start a New Job
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 14, margin: "0 0 28px", maxWidth: '500px' }}>
+            <p className="banner-desc" style={{ color: "var(--text-muted)", fontSize: 14, margin: "0 0 28px", maxWidth: '500px' }}>
               Paste a YouTube URL and let Gemini AI extract the most viral, high-engagement moments for you automatically.
             </p>
             <button onClick={onNewJob} className="btn-primary" style={{ padding: '14px 32px' }}>
@@ -88,7 +88,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
         </div>
 
         {/* Recent Jobs */}
-        <div>
+        <div style={{ marginBottom: 20 }}>
           <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
               Recent Jobs
@@ -108,6 +108,36 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
           }
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-container {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+          .stat-card {
+            padding: 16px !important;
+          }
+          .stat-value {
+            font-size: 32px !important;
+          }
+          .quick-create-banner {
+            padding: 24px !important;
+          }
+          .banner-title {
+            font-size: 20px !important;
+          }
+          .banner-desc {
+            font-size: 13px !important;
+            margin-bottom: 20px !important;
+          }
+        }
+        @media (max-width: 480px) {
+           .stats-container {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

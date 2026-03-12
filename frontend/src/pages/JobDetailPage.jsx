@@ -175,12 +175,12 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
 
       {/* Pipeline */}
       {liveStatus !== "failed" && (
-        <div className="card" style={{ padding: "24px 28px", marginBottom: 28 }}>
+        <div className="card pipeline-card" style={{ padding: "24px 28px", marginBottom: 28 }}>
           <p style={{ color: "var(--text-dim)", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 20px" }}>
             Processing Pipeline
           </p>
 
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div className="pipeline-container" style={{ display: "flex", alignItems: "center" }}>
             {STEPS.map((step, i) => {
               const done = i < currentStep || liveStatus === "completed";
               const active =
@@ -190,6 +190,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               return (
                 <div
                   key={step}
+                  className="pipeline-step"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -197,11 +198,13 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                   }}
                 >
                   <div
+                    className="step-marker-container"
                     style={{
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       gap: 6,
+                      zIndex: 2
                     }}
                   >
                     <div
@@ -232,6 +235,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                     </div>
 
                     <span
+                      className="step-label"
                       style={{
                         color: active
                           ? "#fff"
@@ -251,12 +255,13 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
 
                   {i < STEPS.length - 1 && (
                     <div
+                      className="step-connector"
                       style={{
                         flex: 1,
                         height: 2,
                         background: done
                           ? "#00e59944"
-                          : "#1a1a1a",
+                          : "#1a1a2a",
                         margin: "0 4px",
                         marginBottom: 22,
                       }}
@@ -271,12 +276,16 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
 
       {/* Video Clips */}
       {clips.length > 0 && (
-        <div>
+        <div style={{ marginBottom: 40 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: "0 0 16px" }}>
             Generated Clips
           </h2>
 
-          <div className="grid grid-cols-4 gap-md">
+          <div className="clips-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '20px'
+          }}>
             {clips.map((clipPath, i) => {
               const videoUrl = clipPath.startsWith("http")
                 ? clipPath
@@ -286,20 +295,20 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                 )}`;
 
               return (
-                <div key={i} className="card" style={{ padding: 0, overflow: "hidden" }}>
+                <div key={i} className="card clip-card" style={{ padding: 0, overflow: "hidden" }}>
                   <video
                     controls
                     src={videoUrl}
                     style={{
                       width: "100%",
-                      maxHeight: 200,
+                      aspectRatio: '16/9',
                       background: "#000",
                       display: "block",
                     }}
                   />
 
-                  <div style={{ padding: "12px 16px" }} className="flex justify-between items-center">
-                    <span style={{ color: "var(--text-dim)", fontSize: 11 }}>
+                  <div style={{ padding: "16px" }} className="flex justify-between items-center">
+                    <span className="font-syne" style={{ color: "#fff", fontSize: 14, fontWeight: 600 }}>
                       Clip {i + 1}
                     </span>
 
@@ -307,15 +316,19 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                       href={videoUrl}
                       download={`clip_${i + 1}.mp4`}
                       style={{
-                        background: "#001a0f",
-                        border: "1px solid #00e59933",
+                        background: "rgba(0, 229, 153, 0.1)",
+                        border: "1px solid var(--primary)",
                         borderRadius: 8,
-                        color: "#00e599",
-                        padding: "5px 12px",
+                        color: "var(--primary)",
+                        padding: "6px 14px",
                         fontSize: 11,
                         fontFamily: "'DM Mono', monospace",
                         textDecoration: "none",
+                        fontWeight: 600,
+                        transition: 'all 0.2s'
                       }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#000'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0, 229, 153, 0.1)'; e.currentTarget.style.color = 'var(--primary)'; }}
                     >
                       ↓ Download
                     </a>
@@ -326,6 +339,47 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
           </div>
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          .pipeline-container {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0 !important;
+          }
+          .pipeline-step {
+            flex-direction: row !important;
+            width: 100% !important;
+            flex: none !important;
+            height: 60px !important;
+          }
+          .step-marker-container {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 16px !important;
+          }
+          .step-label {
+            font-size: 11px !important;
+          }
+          .step-connector {
+            position: absolute !important;
+            left: 13px !important;
+            top: 28px !important;
+            width: 2px !important;
+            height: 32px !important;
+            margin: 0 !important;
+          }
+          .pipeline-card {
+            padding: 20px !important;
+          }
+          .clips-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .clip-card video {
+             max-height: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
