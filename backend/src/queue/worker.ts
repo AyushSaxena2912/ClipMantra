@@ -127,7 +127,7 @@ const startWorker = async () => {
         // yt-dlp se audio download
         await execAsync(
           `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=web" ` +
+          `--extractor-args "youtube:player_client=ios" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
           `--audio-format mp3 ` +
