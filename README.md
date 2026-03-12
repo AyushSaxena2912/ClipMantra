@@ -42,7 +42,7 @@ Cleanup Worker  →  Files auto-deleted 24hrs after completion
 | **Transcription** | Python + Faster-Whisper (tiny model, CPU/int8) |
 | **Video Processing** | `yt-dlp/Rapid API` + `ffmpeg` |
 | **Auth** | JWT + bcrypt + Google OAuth2 |
-| **Email** | Nodemailer (Gmail SMTP) |
+| **Email** | Resend (SDK) |
 | **Real-time** | Server-Sent Events (SSE) + Redis Pub/Sub |
 | **Containerization** | Docker |
 | **Deployment** | Railway + Vercel |
