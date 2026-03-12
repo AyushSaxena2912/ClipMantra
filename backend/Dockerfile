@@ -62,7 +62,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh \
     && pip3 install yt-dlp faster-whisper bgutil-ytdlp-pot-provider --break-system-packages \
-    && ln -sf $(which yt-dlp) /usr/local/bin/yt-dlp \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
