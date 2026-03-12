@@ -108,17 +108,18 @@ const startWorker = async () => {
           ? `--cookies "${process.env.YOUTUBE_COOKIES_PATH}"`
           : "";
 
-        // yt-dlp se video download
-        await execAsync(
-          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=web" ` +
-          `-f "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/bestvideo+bestaudio/best" ` +
-          `--merge-output-format mp4 ` +
-          `--no-playlist ` +
-          `-o "${videoPath}" ` +
-          `"${jobData.url}"`,
-          { timeout: 5 * 60 * 1000 }
-        );
+     // yt-dlp se video download
+await execAsync(
+  `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
+  `--extractor-args "youtube:player_client=android" ` +
+  `--retries 10 --fragment-retries 10 ` +
+  `-f "bv*[height<=1080]+ba/best" ` +
+  `--merge-output-format mp4 ` +
+  `--no-playlist ` +
+  `-o "${videoPath}" ` +
+  `"${jobData.url}"`,
+  { timeout: 5 * 60 * 1000 }
+);
 
         const stats = fs.statSync(videoPath);
         if (!stats || stats.size < 100000)
@@ -127,7 +128,7 @@ const startWorker = async () => {
         // yt-dlp se audio download
         await execAsync(
           `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=ios" ` +
+          `--extractor-args "youtube:player_client=android" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
           `--audio-format mp3 ` +
