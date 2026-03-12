@@ -206,7 +206,7 @@ const AuthPage = ({ onLogin, toast }) => {
           <div className="flex flex-col" style={{ gap: 14 }}>
             {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
             {["login", "register", "forgot", "reset"].includes(mode) && (
-              <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
+              <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" autoFocus={true} />
             )}
             {mode === "reset" && <Input label="OTP Code" value={f.otp} onChange={set("otp")} placeholder="6-digit OTP" />}
 

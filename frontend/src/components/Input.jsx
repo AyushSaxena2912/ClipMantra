@@ -1,4 +1,4 @@
-const Input = ({ label, type = "text", value, onChange, placeholder }) => (
+const Input = ({ label, type = "text", value, onChange, placeholder, autoFocus }) => (
   <div>
     <label style={{
       display: "block", color: "#555", fontSize: 11,
@@ -12,6 +12,7 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
       value={value}
       onChange={onChange}
       placeholder={placeholder}
+      autoFocus={autoFocus}
       style={{
         width: "100%", padding: "12px 14px",
         background: "var(--bg-input)", border: "1px solid var(--border-color)",
