@@ -3,9 +3,13 @@ import { api, saveToken, saveUser } from "../api";
 import Input from "../components/Input";
 
 const AuthPage = ({ onLogin, toast }) => {
-  const [mode, setMode] = useState("login"); // login | register | forgot | reset
+  const [mode, setMode] = useState("login");
   const [f, setF] = useState({ name: "", email: "", password: "", confirm: "", otp: "", newPass: "", confirmNew: "" });
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmNew, setShowConfirmNew] = useState(false);
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
@@ -49,8 +53,77 @@ const AuthPage = ({ onLogin, toast }) => {
     }
   };
 
-  const titles    = { login: "Sign In", register: "Create Account", forgot: "Reset Password", reset: "Enter OTP" };
+  const titles    = { login: "Login", register: "Create Account", forgot: "Reset Password", reset: "Enter OTP" };
   const subtitles = { login: "Welcome back to ClipMantra", register: "Start clipping viral moments", forgot: "We'll send an OTP to your email", reset: "Enter the OTP from your email" };
+  const btnLabels = { login: "Login", register: "Create Account", forgot: "Send OTP", reset: "Reset Password" };
+
+  const EyeIcon = ({ show }) => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {show ? (
+        <>
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+        </>
+      ) : (
+        <>
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </>
+      )}
+    </svg>
+  );
+
+  const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <label style={{ color: "#888", fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>
+        {label}
+      </label>
+      <div style={{ position: "relative" }}>
+        <input
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          style={{
+            width: "100%",
+            padding: "12px 44px 12px 14px",
+            background: "#0a0a12",
+            border: "1px solid #1e1e2e",
+            borderRadius: 10,
+            color: "#fff",
+            fontSize: 14,
+            fontFamily: "'DM Mono', monospace",
+            outline: "none",
+            boxSizing: "border-box",
+            transition: "border 0.2s",
+          }}
+          onFocus={e => e.target.style.border = "1px solid #00e599"}
+          onBlur={e => e.target.style.border = "1px solid #1e1e2e"}
+        />
+        <button
+          type="button"
+          onClick={onToggle}
+          style={{
+            position: "absolute",
+            right: 12,
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: show ? "#00e599" : "#444",
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            transition: "color 0.2s",
+          }}
+        >
+          <EyeIcon show={show} />
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{
@@ -107,16 +180,45 @@ const AuthPage = ({ onLogin, toast }) => {
               <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
             )}
             {mode === "reset" && <Input label="OTP Code" value={f.otp} onChange={set("otp")} placeholder="6-digit OTP" />}
+
             {["login","register"].includes(mode) && (
-              <Input label="Password" type="password" value={f.password} onChange={set("password")} placeholder="••••••••" />
+              <PasswordInput
+                label="Password"
+                value={f.password}
+                onChange={set("password")}
+                placeholder="••••••••"
+                show={showPass}
+                onToggle={() => setShowPass(p => !p)}
+              />
             )}
             {mode === "register" && (
-              <Input label="Confirm Password" type="password" value={f.confirm} onChange={set("confirm")} placeholder="••••••••" />
+              <PasswordInput
+                label="Confirm Password"
+                value={f.confirm}
+                onChange={set("confirm")}
+                placeholder="••••••••"
+                show={showConfirm}
+                onToggle={() => setShowConfirm(p => !p)}
+              />
             )}
             {mode === "reset" && (
               <>
-                <Input label="New Password" type="password" value={f.newPass} onChange={set("newPass")} placeholder="••••••••" />
-                <Input label="Confirm New Password" type="password" value={f.confirmNew} onChange={set("confirmNew")} placeholder="••••••••" />
+                <PasswordInput
+                  label="New Password"
+                  value={f.newPass}
+                  onChange={set("newPass")}
+                  placeholder="••••••••"
+                  show={showNewPass}
+                  onToggle={() => setShowNewPass(p => !p)}
+                />
+                <PasswordInput
+                  label="Confirm New Password"
+                  value={f.confirmNew}
+                  onChange={set("confirmNew")}
+                  placeholder="••••••••"
+                  show={showConfirmNew}
+                  onToggle={() => setShowConfirmNew(p => !p)}
+                />
               </>
             )}
 
@@ -139,7 +241,7 @@ const AuthPage = ({ onLogin, toast }) => {
                 transition: "all 0.2s",
               }}
             >
-              {loading ? "Please wait..." : titles[mode]}
+              {loading ? "Please wait..." : btnLabels[mode]}
             </button>
           </div>
 
