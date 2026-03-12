@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api, saveToken, saveUser } from "../api";
 import Input from "../components/Input";
 
-// ✅ Outside AuthPage — nahi toh har render pe re-mount hoga aur focus lost hogi
 const EyeIcon = ({ show }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     {show ? (
@@ -20,7 +19,6 @@ const EyeIcon = ({ show }) => (
   </svg>
 );
 
-// ✅ Outside AuthPage
 const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
     <label style={{ color: "#888", fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>
@@ -89,6 +87,42 @@ const AuthPage = ({ onLogin, toast }) => {
 
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
+  const handleGoogleLogin = async (response) => {
+    setLoading(true);
+    try {
+      const r = await api("/auth/google", {
+        method: "POST",
+        body: JSON.stringify({ token: response.credential }),
+      });
+      if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Welcome!", "success"); }
+      else toast(r.data.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initGoogle = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleLogin,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById("google-btn"),
+          { theme: "filled_black", size: "large", width: 348, text: "continue_with" }
+        );
+      }
+    };
+
+    if (window.google) {
+      initGoogle();
+    } else {
+      const script = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      script?.addEventListener("load", initGoogle);
+    }
+  }, [mode]);
+
   const submit = async () => {
     setLoading(true);
     try {
@@ -97,7 +131,7 @@ const AuthPage = ({ onLogin, toast }) => {
           method: "POST",
           body: JSON.stringify({ email: f.email, password: f.password }),
         });
-        if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Welcome back! 🎬", "success"); }
+        if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Welcome back!", "success"); }
         else toast(r.data.message, "error");
 
       } else if (mode === "register") {
@@ -105,7 +139,7 @@ const AuthPage = ({ onLogin, toast }) => {
           method: "POST",
           body: JSON.stringify({ name: f.name, email: f.email, password: f.password, confirmPassword: f.confirm }),
         });
-        if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Account created! 🎬", "success"); }
+        if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Account created!", "success"); }
         else toast(r.data.message, "error");
 
       } else if (mode === "forgot") {
@@ -139,13 +173,11 @@ const AuthPage = ({ onLogin, toast }) => {
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: 20, position: "relative", overflow: "hidden",
     }}>
-      {/* BG Grid */}
       <div style={{
         position: "absolute", inset: 0,
         backgroundImage: "linear-gradient(rgba(0,229,153,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,153,0.03) 1px, transparent 1px)",
         backgroundSize: "60px 60px", pointerEvents: "none",
       }} />
-      {/* Glow */}
       <div style={{
         position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)",
         width: 400, height: 400,
@@ -154,7 +186,6 @@ const AuthPage = ({ onLogin, toast }) => {
       }} />
 
       <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }}>
-        {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <div style={{
@@ -169,7 +200,6 @@ const AuthPage = ({ onLogin, toast }) => {
           </p>
         </div>
 
-        {/* Card */}
         <div style={{
           background: "#0d0d14", border: "1px solid #1e1e2e",
           borderRadius: 20, padding: 36,
@@ -183,7 +213,7 @@ const AuthPage = ({ onLogin, toast }) => {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="John Doe" />}
+            {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
             {["login","register","forgot","reset"].includes(mode) && (
               <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
             )}
@@ -251,9 +281,19 @@ const AuthPage = ({ onLogin, toast }) => {
             >
               {loading ? "Please wait..." : btnLabels[mode]}
             </button>
+
+            {["login", "register"].includes(mode) && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "6px 0" }}>
+                  <div style={{ flex: 1, height: 1, background: "#1e1e2e" }} />
+                  <span style={{ color: "#444", fontSize: 11, fontFamily: "'DM Mono', monospace" }}>OR</span>
+                  <div style={{ flex: 1, height: 1, background: "#1e1e2e" }} />
+                </div>
+                <div id="google-btn" style={{ display: "flex", justifyContent: "center" }} />
+              </>
+            )}
           </div>
 
-          {/* Mode switches */}
           <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
             {mode === "login" && (
               <>
