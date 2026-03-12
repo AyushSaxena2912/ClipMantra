@@ -1,21 +1,10 @@
-import nodemailer from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOTPEmail = async (email: string, otp: string) => {
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    family: 4,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
-    },
-  } as SMTPTransport.Options);
-
-  await transporter.sendMail({
-    from: `"ClipMantra Support" <${process.env.MAIL_USER}>`,
+  await resend.emails.send({
+    from: "ClipMantra Support <onboarding@resend.dev>",
     to: email,
     subject: "Password Reset OTP",
     html: `
