@@ -20,93 +20,93 @@ const EmptyState = ({ label }) => (
 
 const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
   const stats = {
-    total:     jobs.length,
+    total: jobs.length,
     completed: jobs.filter((j) => j.status === "completed").length,
-    active:    jobs.filter((j) => ["queued","downloading","transcribing","rendering","processing"].includes(j.status)).length,
-    failed:    jobs.filter((j) => j.status === "failed").length,
+    active: jobs.filter((j) => ["queued", "downloading", "transcribing", "rendering", "processing"].includes(j.status)).length,
+    failed: jobs.filter((j) => j.status === "failed").length,
   };
 
   return (
     <div>
-      <div style={{ marginBottom: 36 }}>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
-          Dashboard
-        </h1>
-        <p style={{ color: "#555", fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
-          Extract viral clips from any YouTube video using AI
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 36 }}>
-        {[
-          { label: "Total Jobs",  value: stats.total,     color: "#fff"    },
-          { label: "Completed",   value: stats.completed, color: "#00e599" },
-          { label: "Processing",  value: stats.active,    color: "#f0a500" },
-          { label: "Failed",      value: stats.failed,    color: "#ff3b3b" },
-        ].map((s) => (
-          <div key={s.label} style={{ background: "#0d0d14", border: "1px solid #1e1e2e", borderRadius: 14, padding: "20px 22px" }}>
-            <p style={{ color: "#444", fontSize: 10, fontFamily: "'DM Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px" }}>
-              {s.label}
-            </p>
-            <p style={{ color: s.color, fontSize: 32, fontFamily: "'Syne', sans-serif", fontWeight: 800, margin: 0 }}>
-              {s.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Quick Create Banner */}
-      <div style={{
-        background: "linear-gradient(135deg, #0d1a12, #050f0a)",
-        border: "1px solid #00e59922", borderRadius: 16,
-        padding: "28px 32px", marginBottom: 32,
-        position: "relative", overflow: "hidden",
-      }}>
-        <div style={{
-          position: "absolute", right: -30, top: -30,
-          width: 200, height: 200,
-          background: "radial-gradient(circle, rgba(0,229,153,0.06) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>
-          Start a New Job
-        </h2>
-        <p style={{ color: "#555", fontSize: 12, fontFamily: "'DM Mono', monospace", margin: "0 0 20px" }}>
-          Paste a YouTube URL and let Gemini AI find the viral moments
-        </p>
-        <button
-          onClick={onNewJob}
-          style={{
-            padding: "12px 28px",
-            background: "linear-gradient(135deg, #00e599, #00c47a)",
-            color: "#000", border: "none", borderRadius: 10,
-            fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 14, cursor: "pointer",
-          }}
-        >
-          Create Job →
-        </button>
-      </div>
-
-      {/* Recent Jobs */}
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>
-            Recent Jobs
-          </h2>
-          <button onClick={onViewAll} style={{ background: "none", border: "none", color: "#00e599", cursor: "pointer", fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
-            View all →
-          </button>
+      <div className="flex flex-col gap-xl">
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 6px" }}>
+            Dashboard
+          </h1>
+          <p style={{ color: "var(--text-muted)", fontSize: 12 }}>
+            Extract viral clips from any YouTube video using AI
+          </p>
         </div>
 
-        {loading ? <LoadingState /> : jobs.length === 0
-          ? <EmptyState label="No jobs yet. Create your first one!" />
-          : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {jobs.slice(0, 5).map((j) => <JobRow key={j.id} job={j} onClick={() => onViewJob(j)} />)}
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-md">
+          {[
+            { label: "Total Jobs", value: stats.total, color: "var(--text-main)", glow: "rgba(255,255,255,0.2)" },
+            { label: "Completed", value: stats.completed, color: "var(--primary)", glow: "rgba(0, 229, 153, 0.3)" },
+            { label: "Processing", value: stats.active, color: "var(--accent-orange)", glow: "rgba(240, 165, 0, 0.3)" },
+            { label: "Failed", value: stats.failed, color: "var(--accent-red)", glow: "rgba(255, 59, 59, 0.3)" },
+          ].map((s) => (
+            <div key={s.label} className="card stat-card" style={{ padding: "24px", '--glow-color': s.glow }}>
+              <p style={{ color: "var(--text-dim)", fontSize: 10, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 12px" }}>
+                {s.label}
+              </p>
+              <p className="font-syne" style={{ color: s.color, fontSize: 40, fontWeight: 800, margin: "0 0 12px", lineHeight: 1 }}>
+                {s.value}
+              </p>
+              {/* Visual indicator bar */}
+              <div style={{ height: 4, width: '100%', background: 'rgba(255,255,255,0.03)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: stats.total > 0 ? `${(s.value / stats.total) * 100}%` : '0%', background: s.color, opacity: 0.6 }} />
+              </div>
             </div>
-          )
-        }
+          ))}
+        </div>
+
+        {/* Quick Create Banner */}
+        <div className="card stat-card" style={{
+          background: "linear-gradient(135deg, rgba(0, 229, 153, 0.05), rgba(5, 15, 10, 0.4))",
+          border: "1px solid rgba(0, 229, 153, 0.15)",
+          padding: "40px",
+          '--glow-color': 'rgba(0, 229, 153, 0.2)'
+        }}>
+          <div style={{
+            position: "absolute", right: -50, top: -50,
+            width: 250, height: 250,
+            background: "radial-gradient(circle, rgba(0,229,153,0.1) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px" }}>
+              Start a New Job
+            </h2>
+            <p style={{ color: "var(--text-muted)", fontSize: 14, margin: "0 0 28px", maxWidth: '500px' }}>
+              Paste a YouTube URL and let Gemini AI extract the most viral, high-engagement moments for you automatically.
+            </p>
+            <button onClick={onNewJob} className="btn-primary" style={{ padding: '14px 32px' }}>
+              Create Job →
+            </button>
+          </div>
+        </div>
+
+        {/* Recent Jobs */}
+        <div>
+          <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
+              Recent Jobs
+            </h2>
+            <button onClick={onViewAll} style={{ background: "none", border: "none", color: "var(--primary)", cursor: "pointer", fontSize: 12 }}>
+              View all →
+            </button>
+          </div>
+
+          {loading ? <LoadingState /> : jobs.length === 0
+            ? <EmptyState label="No jobs yet. Create your first one!" />
+            : (
+              <div className="flex flex-col" style={{ gap: 10 }}>
+                {jobs.slice(0, 5).map((j) => <JobRow key={j.id} job={j} onClick={() => onViewJob(j)} />)}
+              </div>
+            )
+          }
+        </div>
       </div>
     </div>
   );

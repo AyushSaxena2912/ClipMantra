@@ -1,89 +1,243 @@
+import { useState } from "react";
+
 const NAV = [
-  { id: "home",     icon: "⬡", label: "Dashboard" },
-  { id: "new-job",  icon: "＋", label: "New Job"   },
-  { id: "jobs",     icon: "≡", label: "All Jobs"  },
-  { id: "settings", icon: "◎", label: "Settings"  },
+  {
+    section: "Create", items: [
+      { id: "new-job", icon: "＋", label: "New Job", badge: "New" },
+    ]
+  },
+  {
+    section: "Manage", items: [
+      { id: "home", icon: "⬡", label: "Dashboard" },
+      { id: "jobs", icon: "≡", label: "All Jobs" },
+    ]
+  },
+  {
+    section: "Settings", items: [
+      { id: "settings", icon: "◎", label: "Settings" },
+    ]
+  }
 ];
 
-const Sidebar = ({ page, setPage, user, onLogout }) => (
-  <div style={{
-    width: 220, background: "#080810",
-    borderRight: "1px solid #111",
-    display: "flex", flexDirection: "column", padding: "24px 0",
-  }}>
-    {/* Logo */}
-    <div style={{ padding: "0 24px 32px", borderBottom: "1px solid #111" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{
-          width: 30, height: 30,
-          background: "linear-gradient(135deg, #00e599, #00aaff)",
-          borderRadius: 8, display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 14,
-        }}>✂️</div>
-        <span style={{
-          fontFamily: "'Syne', sans-serif", fontSize: 20,
-          fontWeight: 800, color: "#fff",
-        }}>ClipMantra</span>
-      </div>
-    </div>
+const Sidebar = ({ page, setPage, user, onLogout }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-    {/* Nav Links */}
-    <nav style={{
-      flex: 1, padding: "20px 12px",
-      display: "flex", flexDirection: "column", gap: 4,
-    }}>
-      {NAV.map((n) => (
-        <button key={n.id} onClick={() => setPage(n.id)} style={{
-          display: "flex", alignItems: "center", gap: 12,
-          padding: "11px 14px",
-          background: page === n.id ? "#0d0d1a" : "transparent",
-          border: page === n.id ? "1px solid #1e1e2e" : "1px solid transparent",
-          borderRadius: 10,
-          color: page === n.id ? "#00e599" : "#555",
-          cursor: "pointer",
-          fontFamily: "'DM Mono', monospace", fontSize: 13,
-          textAlign: "left", transition: "all 0.15s",
-        }}>
-          <span style={{ fontSize: 16, width: 18, textAlign: "center" }}>{n.icon}</span>
-          {n.label}
-        </button>
-      ))}
-    </nav>
+  const handleNav = (id) => {
+    setPage(id);
+    setIsOpen(false);
+  };
 
-    {/* User Info */}
-    <div style={{ padding: "16px 16px 0", borderTop: "1px solid #111" }}>
-      <div style={{
-        padding: "10px 14px", background: "#0d0d1a",
-        borderRadius: 10, border: "1px solid #1e1e2e",
+  return (
+    <>
+      <div className="mobile-header" style={{
+        display: "none",
+        padding: "16px 20px",
+        background: "var(--bg-sidebar)",
+        borderBottom: "1px solid var(--border-muted)",
+        alignItems: "center",
+        justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
       }}>
-        <p style={{
-          color: "#fff", fontSize: 13,
-          fontFamily: "'Syne', sans-serif", fontWeight: 600,
-          margin: "0 0 2px",
-          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-        }}>{user?.name}</p>
-        <p style={{
-          color: "#444", fontSize: 10,
-          fontFamily: "'DM Mono', monospace",
-          margin: "0 0 10px",
-          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-        }}>{user?.email}</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span className="font-syne" style={{ fontSize: 18, fontWeight: 800 }}>ClipMantra</span>
+          <span style={{
+            fontSize: 10, background: '#1a1a2e', padding: '2px 8px',
+            borderRadius: 4, color: 'var(--text-muted)', border: '1px solid var(--border-color)'
+          }}>Free</span>
+        </div>
         <button
-          onClick={onLogout}
-          style={{
-            background: "none", border: "1px solid #2a2a2a",
-            borderRadius: 6, color: "#555", cursor: "pointer",
-            fontSize: 11, fontFamily: "'DM Mono', monospace",
-            padding: "5px 10px", width: "100%", transition: "all 0.15s",
-          }}
-          onMouseEnter={(e) => { e.target.style.borderColor = "#ff3b3b"; e.target.style.color = "#ff3b3b"; }}
-          onMouseLeave={(e) => { e.target.style.borderColor = "#2a2a2a"; e.target.style.color = "#555"; }}
+          onClick={() => setIsOpen(!isOpen)}
+          style={{ background: "none", border: "none", color: "var(--primary)", fontSize: 24, cursor: "pointer" }}
         >
-          Sign Out
+          {isOpen ? "✕" : "☰"}
         </button>
       </div>
-    </div>
-  </div>
-);
+
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-header { display: flex !important; }
+          .sidebar-container {
+            position: fixed;
+            top: 60px;
+            left: ${isOpen ? "0" : "-100%"};
+            width: 280px !important;
+            height: calc(100vh - 60px);
+            z-index: 90;
+            transition: left 0.3s ease;
+          }
+          .sidebar-overlay {
+            display: ${isOpen ? "block" : "none"};
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 80;
+          }
+          .collapse-btn { display: none !important; }
+        }
+      `}</style>
+
+      {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
+
+      <div className="sidebar-container" style={{
+        width: isCollapsed ? 80 : 260,
+        background: "var(--bg-sidebar)",
+        borderRight: "1px solid var(--border-muted)",
+        display: "flex", flexDirection: "column", padding: "24px 0",
+        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        position: 'relative',
+        overflow: 'visible'
+      }}>
+        {/* Toggle Button - Integrated at the top */}
+        <div style={{
+          padding: "0 22px 24px",
+          display: 'flex',
+          justifyContent: isCollapsed ? 'center' : 'space-between',
+          alignItems: 'center',
+          borderBottom: "1px solid var(--border-muted)",
+          marginBottom: 8
+        }}>
+          {!isCollapsed && <span className="font-syne" style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap' }}>ClipMantra</span>}
+          <button
+            className="collapse-btn"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 10,
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+          >
+            {isCollapsed ? "→" : "←"}
+          </button>
+        </div>
+
+        {/* Nav Links */}
+        <nav style={{
+          flex: 1, padding: "24px 12px",
+          display: "flex", flexDirection: "column", gap: 32,
+          overflow: 'hidden'
+        }}>
+          {NAV.map((section) => (
+            <div key={section.section}>
+              {!isCollapsed && (
+                <p style={{
+                  color: 'var(--text-dim)', fontSize: 10, fontWeight: 600,
+                  textTransform: 'uppercase', letterSpacing: 1.5,
+                  padding: '0 12px 12px'
+                }}>
+                  {section.section}
+                </p>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {section.items.map((n) => (
+                  <button key={n.id} onClick={() => handleNav(n.id)} style={{
+                    display: "flex", alignItems: "center", gap: 16,
+                    padding: isCollapsed ? "12px 0" : "10px 14px",
+                    justifyContent: isCollapsed ? "center" : "flex-start",
+                    background: page === n.id ? "rgba(0, 229, 153, 0.05)" : "transparent",
+                    border: "none",
+                    borderRadius: 10,
+                    color: page === n.id ? "var(--primary)" : "var(--text-muted)",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    textAlign: "left", transition: "all 0.2s",
+                    width: '100%',
+                    position: 'relative'
+                  }}>
+                    <span style={{ fontSize: 20, minWidth: 20, textAlign: "center", opacity: page === n.id ? 1 : 0.7 }}>{n.icon}</span>
+                    {!isCollapsed && <span style={{ whiteSpace: 'nowrap', fontWeight: page === n.id ? 600 : 400 }}>{n.label}</span>}
+                    {n.badge && !isCollapsed && (
+                      <span style={{
+                        fontSize: 8, background: 'var(--primary)', color: '#000',
+                        padding: '1px 4px', borderRadius: 4, fontWeight: 700,
+                        textTransform: 'uppercase', marginLeft: 'auto'
+                      }}>{n.badge}</span>
+                    )}
+                    {page === n.id && isCollapsed && (
+                      <div style={{
+                        position: 'absolute', left: 4, width: 3, height: 16,
+                        borderRadius: 2, background: 'var(--primary)'
+                      }} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* User Info */}
+        <div style={{ padding: "16px 12px 0", borderTop: "1px solid var(--border-muted)", overflow: 'hidden' }}>
+          <div style={{
+            padding: isCollapsed ? "12px 0" : "10px",
+            borderRadius: 12,
+            display: 'flex', flexDirection: 'column', alignItems: isCollapsed ? 'center' : 'stretch',
+            gap: 12
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+              justifyContent: isCollapsed ? 'center' : 'flex-start',
+              padding: isCollapsed ? 0 : '4px 8px',
+              background: isCollapsed ? 'transparent' : 'rgba(255,255,255,0.02)',
+              borderRadius: 12,
+              border: isCollapsed ? 'none' : '1px solid var(--border-color)'
+            }}>
+              <div style={{
+                minWidth: 32, height: 32, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1e1e3e, #0a0a1a)',
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'center', color: 'var(--primary)',
+                fontSize: 14, fontWeight: 700, border: '1px solid rgba(255,255,255,0.05)'
+              }}>
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+              {!isCollapsed && (
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <p className="font-syne" style={{
+                    color: "#fff", fontSize: 13, fontWeight: 600,
+                    margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>{user?.name}</p>
+                </div>
+              )}
+            </div>
+
+            {!isCollapsed && (
+              <button
+                onClick={onLogout}
+                style={{
+                  background: "transparent", border: "1px solid var(--border-muted)",
+                  borderRadius: 8, color: "var(--text-dim)", cursor: "pointer",
+                  fontSize: 11, padding: "8px", width: "100%", transition: "all 0.2s",
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent-red)"; e.currentTarget.style.color = "var(--accent-red)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-muted)"; e.currentTarget.style.color = "var(--text-dim)"; }}
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Sidebar;

@@ -163,14 +163,13 @@ const AuthPage = ({ onLogin, toast }) => {
     }
   };
 
-  const titles    = { login: "Login", register: "Create Account", forgot: "Reset Password", reset: "Enter OTP" };
+  const titles = { login: "Login", register: "Create Account", forgot: "Reset Password", reset: "Enter OTP" };
   const subtitles = { login: "Welcome back to ClipMantra", register: "Start clipping viral moments", forgot: "We'll send an OTP to your email", reset: "Enter the OTP from your email" };
   const btnLabels = { login: "Login", register: "Create Account", forgot: "Send OTP", reset: "Reset Password" };
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#050508",
-      display: "flex", alignItems: "center", justifyContent: "center",
+    <div className="flex items-center justify-center" style={{
+      minHeight: "100vh", background: "var(--bg-dark)",
       padding: 20, position: "relative", overflow: "hidden",
     }}>
       <div style={{
@@ -185,41 +184,33 @@ const AuthPage = ({ onLogin, toast }) => {
         pointerEvents: "none",
       }} />
 
-      <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-            <div style={{
-              width: 36, height: 36,
-              background: "linear-gradient(135deg, #00e599, #00aaff)",
-              borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18,
-            }}>✂️</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: -1 }}>ClipMantra</span>
+      <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }} className="flex flex-col items-center">
+        <div className="text-center" style={{ marginBottom: 40 }}>
+          <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 8 }}>
+
+            <span className="font-syne" style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: -1 }}>ClipMantra</span>
           </div>
-          <p style={{ color: "#666", fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>
+          <p style={{ color: "var(--text-dim)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>
             AI-Powered Viral Clip Extractor
           </p>
         </div>
 
-        <div style={{
-          background: "#0d0d14", border: "1px solid #1e1e2e",
-          borderRadius: 20, padding: 36,
-          boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
-        }}>
-          <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>
+        <div className="card" style={{ padding: "36px", boxShadow: "0 40px 80px rgba(0,0,0,0.6)" }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 4px" }}>
             {titles[mode]}
           </h2>
-          <p style={{ color: "#555", fontSize: 13, fontFamily: "'DM Mono', monospace", margin: "0 0 28px" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 13, margin: "0 0 28px" }}>
             {subtitles[mode]}
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col" style={{ gap: 14 }}>
             {mode === "register" && <Input label="Full Name" value={f.name} onChange={set("name")} placeholder="Tony Stark" />}
-            {["login","register","forgot","reset"].includes(mode) && (
+            {["login", "register", "forgot", "reset"].includes(mode) && (
               <Input label="Email" type="email" value={f.email} onChange={set("email")} placeholder="you@example.com" />
             )}
             {mode === "reset" && <Input label="OTP Code" value={f.otp} onChange={set("otp")} placeholder="6-digit OTP" />}
 
-            {["login","register"].includes(mode) && (
+            {["login", "register"].includes(mode) && (
               <PasswordInput
                 label="Password"
                 value={f.password}
@@ -269,15 +260,8 @@ const AuthPage = ({ onLogin, toast }) => {
             <button
               onClick={submit}
               disabled={loading}
-              style={{
-                marginTop: 6, padding: "14px 0",
-                background: loading ? "#111" : "linear-gradient(135deg, #00e599, #00c47a)",
-                color: loading ? "#555" : "#000",
-                border: "none", borderRadius: 12,
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 14,
-                cursor: loading ? "not-allowed" : "pointer",
-                transition: "all 0.2s",
-              }}
+              className="btn-primary"
+              style={{ marginTop: 6, width: "100%" }}
             >
               {loading ? "Please wait..." : btnLabels[mode]}
             </button>
@@ -310,7 +294,7 @@ const AuthPage = ({ onLogin, toast }) => {
                 <button onClick={() => setMode("login")} style={{ ...linkBtn, color: "#00e599" }}>Sign in</button>
               </span>
             )}
-            {["forgot","reset"].includes(mode) && (
+            {["forgot", "reset"].includes(mode) && (
               <button onClick={() => setMode("login")} style={linkBtn}>← Back to login</button>
             )}
           </div>

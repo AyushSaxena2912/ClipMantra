@@ -14,13 +14,13 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
       placeholder={placeholder}
       style={{
         width: "100%", padding: "12px 14px",
-        background: "#080810", border: "1px solid #1e1e2e",
+        background: "var(--bg-input)", border: "1px solid var(--border-color)",
         borderRadius: 10, color: "#fff", fontSize: 14,
-        fontFamily: "'DM Mono', monospace", outline: "none",
+        outline: "none",
         boxSizing: "border-box", transition: "border-color 0.2s",
       }}
-      onFocus={(e) => (e.target.style.borderColor = "#00e599")}
-      onBlur={(e) => (e.target.style.borderColor = "#1e1e2e")}
+      onFocus={(e) => (e.target.style.borderColor = "var(--primary)")}
+      onBlur={(e) => (e.target.style.borderColor = "var(--border-color)")}
     />
   </div>
 );

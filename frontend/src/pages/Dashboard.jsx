@@ -27,14 +27,14 @@ const Dashboard = ({ user, onLogout, toast }) => {
   const openJob = (job) => { setSelectedJob(job); setPage("job-detail"); };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#050508", display: "flex" }}>
+    <div className="main-layout">
       <Sidebar page={page} setPage={setPage} user={user} onLogout={onLogout} />
-      <div style={{ flex: 1, padding: "32px 40px", overflowY: "auto", maxHeight: "100vh" }}>
-        {page === "home"       && <HomePage jobs={jobs} loading={loadingJobs} onNewJob={() => setPage("new-job")} onViewJob={openJob} onViewAll={() => setPage("jobs")} />}
-        {page === "new-job"    && <NewJobPage onJobCreated={(j) => { fetchJobs(); setSelectedJob(j); setPage("job-detail"); }} toast={toast} />}
-        {page === "jobs"       && <JobsPage jobs={jobs} loading={loadingJobs} onViewJob={openJob} onRefresh={fetchJobs} />}
+      <div className="content-area">
+        {page === "home" && <HomePage jobs={jobs} loading={loadingJobs} onNewJob={() => setPage("new-job")} onViewJob={openJob} onViewAll={() => setPage("jobs")} />}
+        {page === "new-job" && <NewJobPage onJobCreated={(j) => { fetchJobs(); setSelectedJob(j); setPage("job-detail"); }} toast={toast} />}
+        {page === "jobs" && <JobsPage jobs={jobs} loading={loadingJobs} onViewJob={openJob} onRefresh={fetchJobs} />}
         {page === "job-detail" && selectedJob && <JobDetailPage job={selectedJob} onBack={() => setPage("jobs")} toast={toast} onRefresh={fetchJobs} />}
-        {page === "settings"   && <SettingsPage user={user} toast={toast} onLogout={onLogout} />}
+        {page === "settings" && <SettingsPage user={user} toast={toast} onLogout={onLogout} />}
       </div>
     </div>
   );

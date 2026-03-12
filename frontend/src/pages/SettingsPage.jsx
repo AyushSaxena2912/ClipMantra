@@ -20,59 +20,52 @@ const SettingsPage = ({ user, toast, onLogout }) => {
   };
 
   return (
-    <div style={{ maxWidth: 520 }}>
-      <div style={{ marginBottom: 36 }}>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
+    <div style={{ maxWidth: 520 }} className="flex flex-col gap-lg">
+      <div>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
           Settings
         </h1>
-        <p style={{ color: "#555", fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
+        <p style={{ color: "var(--text-muted)", fontSize: 12 }}>
           Manage your account
         </p>
       </div>
 
       {/* Profile Card */}
-      <div style={{ background: "#0d0d14", border: "1px solid #1e1e2e", borderRadius: 16, padding: 28, marginBottom: 20 }}>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>Profile</h2>
+      <div className="card" style={{ padding: 28 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>Profile</h2>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <div style={{
+          <div className="font-syne flex items-center justify-center" style={{
             width: 52, height: 52,
-            background: "linear-gradient(135deg, #00e599, #00aaff)",
-            borderRadius: 14, display: "flex", alignItems: "center",
-            justifyContent: "center", fontSize: 20, fontWeight: 800,
-            color: "#000", fontFamily: "'Syne', sans-serif",
+            background: "linear-gradient(135deg, var(--primary), var(--accent-blue))",
+            borderRadius: 14, fontSize: 20, fontWeight: 800,
+            color: "#000",
           }}>
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div>
-            <p style={{ color: "#fff", fontSize: 16, fontFamily: "'Syne', sans-serif", fontWeight: 700, margin: "0 0 2px" }}>{user?.name}</p>
-            <p style={{ color: "#444", fontSize: 12, fontFamily: "'DM Mono', monospace", margin: 0 }}>{user?.email}</p>
+            <p className="font-syne" style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: "0 0 2px" }}>{user?.name}</p>
+            <p style={{ color: "var(--text-dim)", fontSize: 12, margin: 0 }}>{user?.email}</p>
           </div>
         </div>
       </div>
 
       {/* Change Password */}
-      <div style={{ background: "#0d0d14", border: "1px solid #1e1e2e", borderRadius: 16, padding: 28, marginBottom: 20 }}>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>
+      <div className="card" style={{ padding: 28 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>
           Change Password
         </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div className="flex flex-col" style={{ gap: 14 }}>
           <Input label="Current Password" type="password" value={f.old} onChange={set("old")} placeholder="••••••••" />
           <Input label="New Password" type="password" value={f.newp} onChange={set("newp")} placeholder="••••••••" />
           <Input label="Confirm New Password" type="password" value={f.confirm} onChange={set("confirm")} placeholder="••••••••" />
-          <p style={{ color: "#333", fontSize: 11, fontFamily: "'DM Mono', monospace", margin: 0 }}>
+          <p style={{ color: "var(--text-dim)", fontSize: 11, margin: 0 }}>
             8-15 chars · uppercase · lowercase · number · special (@$!%*?&)
           </p>
           <button
             onClick={changePassword}
             disabled={loading}
-            style={{
-              padding: "13px 0",
-              background: loading ? "#111" : "#0d1a12",
-              border: "1px solid #00e59944", borderRadius: 10,
-              color: loading ? "#333" : "#00e599",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 14,
-            }}
+            className="btn-primary"
+            style={{ width: "100%", background: loading ? "#111" : "var(--bg-dark)", border: "1px solid var(--border-color)", color: loading ? "var(--text-dim)" : "var(--primary)" }}
           >
             {loading ? "Updating..." : "Update Password"}
           </button>
@@ -80,11 +73,11 @@ const SettingsPage = ({ user, toast, onLogout }) => {
       </div>
 
       {/* Sign Out */}
-      <div style={{ background: "#100000", border: "1px solid #ff3b3b22", borderRadius: 16, padding: 28 }}>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, color: "#ff3b3b", margin: "0 0 12px" }}>
+      <div className="card" style={{ background: "#100000", border: "1px solid rgba(255, 59, 59, 0.1)", padding: 28 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--accent-red)", margin: "0 0 12px" }}>
           Sign Out
         </h2>
-        <p style={{ color: "#444", fontSize: 12, fontFamily: "'DM Mono', monospace", margin: "0 0 16px" }}>
+        <p style={{ color: "var(--text-dim)", fontSize: 12, margin: "0 0 16px" }}>
           You'll need to sign in again to access your jobs.
         </p>
         <button

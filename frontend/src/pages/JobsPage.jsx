@@ -19,33 +19,33 @@ const EmptyState = () => (
 );
 
 const JobsPage = ({ jobs, loading, onViewJob, onRefresh }) => (
-  <div>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 36 }}>
+  <div className="flex flex-col" style={{ gap: "var(--spacing-lg)" }}>
+    <div className="flex justify-between items-center">
       <div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
           All Jobs
         </h1>
-        <p style={{ color: "#555", fontFamily: "'DM Mono', monospace", fontSize: 12 }}>
+        <p style={{ color: "var(--text-muted)", fontSize: 12 }}>
           {jobs.length} jobs total
         </p>
       </div>
       <button
         onClick={onRefresh}
         style={{
-          padding: "10px 20px", background: "#0d0d14",
-          border: "1px solid #1e1e2e", borderRadius: 10,
-          color: "#555", cursor: "pointer",
-          fontFamily: "'DM Mono', monospace", fontSize: 12, transition: "all 0.15s",
+          padding: "10px 20px", background: "var(--bg-card)",
+          border: "1px solid var(--border-color)", borderRadius: 10,
+          color: "var(--text-muted)", cursor: "pointer",
+          fontSize: 12, transition: "all 0.15s",
         }}
-        onMouseEnter={(e) => { e.target.style.borderColor = "#00e599"; e.target.style.color = "#00e599"; }}
-        onMouseLeave={(e) => { e.target.style.borderColor = "#1e1e2e"; e.target.style.color = "#555"; }}
+        onMouseEnter={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.color = "var(--primary)"; }}
+        onMouseLeave={(e) => { e.target.style.borderColor = "var(--border-color)"; e.target.style.color = "var(--text-muted)"; }}
       >
         ↻ Refresh
       </button>
     </div>
 
     {loading ? <LoadingState /> : jobs.length === 0 ? <EmptyState /> : (
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="flex flex-col" style={{ gap: 10 }}>
         {jobs.map((j) => <JobRow key={j.id} job={j} onClick={() => onViewJob(j)} />)}
       </div>
     )}

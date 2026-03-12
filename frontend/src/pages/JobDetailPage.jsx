@@ -24,10 +24,10 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
     if (job.highlights_path) {
       const path = job.highlights_path.replace(/^storage\//, "");
 
-      fetch(`${API_BASE.replace("/api","")}/storage/${path}`)
+      fetch(`${API_BASE.replace("/api", "")}/storage/${path}`)
         .then((r) => (r.ok ? r.json() : []))
         .then((d) => setHighlights(Array.isArray(d) ? d : []))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [job.highlights_path]);
 
@@ -60,7 +60,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
             }
           });
         }
-      } catch {}
+      } catch { }
     };
 
     es.onerror = () => {
@@ -121,23 +121,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
         }}
       >
         <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginBottom: 6,
-            }}
-          >
-            <h1
-              style={{
-                fontFamily: "'Syne', sans-serif",
-                fontSize: 24,
-                fontWeight: 800,
-                color: "#fff",
-                margin: 0,
-              }}
-            >
+          <div className="flex items-center" style={{ gap: 12, marginBottom: 6 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: 0 }}>
               Job Details
             </h1>
 
@@ -157,18 +142,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
             )}
           </div>
 
-          <p
-            style={{
-              color: "#444",
-              fontSize: 11,
-              fontFamily: "'DM Mono', monospace",
-              margin: 0,
-              maxWidth: 500,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
+          <p style={{ color: "var(--text-dim)", fontSize: 11, margin: 0, maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {job.url}
           </p>
         </div>
@@ -201,25 +175,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
 
       {/* Pipeline */}
       {liveStatus !== "failed" && (
-        <div
-          style={{
-            background: "#0d0d14",
-            border: "1px solid #1e1e2e",
-            borderRadius: 14,
-            padding: "24px 28px",
-            marginBottom: 28,
-          }}
-        >
-          <p
-            style={{
-              color: "#444",
-              fontSize: 10,
-              fontFamily: "'DM Mono', monospace",
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-              margin: "0 0 20px",
-            }}
-          >
+        <div className="card" style={{ padding: "24px 28px", marginBottom: 28 }}>
+          <p style={{ color: "var(--text-dim)", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 20px" }}>
             Processing Pipeline
           </p>
 
@@ -255,8 +212,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         background: done
                           ? "#00e59922"
                           : active
-                          ? "#f0a50022"
-                          : "#111",
+                            ? "#f0a50022"
+                            : "#111",
                         border: `2px solid ${color}`,
                         display: "flex",
                         alignItems: "center",
@@ -279,8 +236,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         color: active
                           ? "#fff"
                           : done
-                          ? "#555"
-                          : "#333",
+                            ? "#555"
+                            : "#333",
                         fontSize: 9,
                         fontFamily: "'DM Mono', monospace",
                         letterSpacing: 1,
@@ -315,44 +272,21 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       {/* Video Clips */}
       {clips.length > 0 && (
         <div>
-          <h2
-            style={{
-              fontFamily: "'Syne', sans-serif",
-              fontSize: 16,
-              fontWeight: 700,
-              color: "#fff",
-              margin: "0 0 16px",
-            }}
-          >
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: "0 0 16px" }}>
             Generated Clips
           </h2>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 16,
-            }}
-          >
+          <div className="grid grid-cols-4 gap-md">
             {clips.map((clipPath, i) => {
               const videoUrl = clipPath.startsWith("http")
                 ? clipPath
-                : `${API_BASE.replace("/api","")}/storage/${clipPath.replace(
-                    /^storage\//,
-                    ""
-                  )}`;
+                : `${API_BASE.replace("/api", "")}/storage/${clipPath.replace(
+                  /^storage\//,
+                  ""
+                )}`;
 
               return (
-                <div
-                  key={i}
-                  style={{
-                    background: "#0d0d14",
-                    border: "1px solid #1e1e2e",
-                    borderRadius: 14,
-                    overflow: "hidden",
-                  }}
-                >
+                <div key={i} className="card" style={{ padding: 0, overflow: "hidden" }}>
                   <video
                     controls
                     src={videoUrl}
@@ -364,21 +298,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                     }}
                   />
 
-                  <div
-                    style={{
-                      padding: "12px 16px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "#555",
-                        fontSize: 11,
-                        fontFamily: "'DM Mono', monospace",
-                      }}
-                    >
+                  <div style={{ padding: "12px 16px" }} className="flex justify-between items-center">
+                    <span style={{ color: "var(--text-dim)", fontSize: 11 }}>
                       Clip {i + 1}
                     </span>
 

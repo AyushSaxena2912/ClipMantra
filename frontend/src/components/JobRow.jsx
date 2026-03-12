@@ -11,25 +11,23 @@ const JobRow = ({ job, onClick }) => {
   return (
     <div
       onClick={onClick}
+      className="card flex items-center justify-between"
       style={{
-        background: "#0d0d14", border: "1px solid #1e1e2e",
-        borderRadius: 12, padding: "16px 20px",
+        padding: "16px 20px",
         cursor: "pointer", transition: "all 0.15s",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "#2a2a3e";
-        e.currentTarget.style.background = "#0f0f18";
+        e.currentTarget.style.borderColor = "rgba(0, 229, 153, 0.3)";
+        e.currentTarget.style.background = "rgba(13, 13, 20, 0.8)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "#1e1e2e";
-        e.currentTarget.style.background = "#0d0d14";
+        e.currentTarget.style.borderColor = "var(--border-color)";
+        e.currentTarget.style.background = "var(--bg-card)";
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
           color: "#fff", fontSize: 13,
-          fontFamily: "'DM Mono', monospace",
           margin: "0 0 4px",
           overflow: "hidden", textOverflow: "ellipsis",
           whiteSpace: "nowrap", maxWidth: 400,
@@ -52,9 +50,9 @@ const JobRow = ({ job, onClick }) => {
           )}
         </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div className="flex items-center" style={{ gap: 12 }}>
         <StatusBadge status={job.status} />
-        <span style={{ color: "#333" }}>›</span>
+        <span style={{ color: "var(--text-dim)" }}>›</span>
       </div>
     </div>
   );
