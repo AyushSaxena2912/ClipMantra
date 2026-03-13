@@ -71,14 +71,27 @@ const NewJobPage = ({ onJobCreated, toast }) => {
           <input
             type="range" min={1} max={10} value={count}
             onChange={(e) => setCount(Number(e.target.value))}
-            style={{ width: "100%", cursor: "pointer" }}
+            style={{ 
+              width: "100%", cursor: "pointer",
+              background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((count - 1) / 9) * 100}%, var(--border-color) ${((count - 1) / 9) * 100}%, var(--border-color) 100%)`,
+              transition: "background 0.1s ease"
+            }}
           />
           <div style={{
-            display: "flex", justifyContent: "space-between",
-            color: "var(--text-dim)", fontSize: "var(--fs-xs)",
-            fontFamily: "var(--font-main)", marginTop: 6,
+            position: "relative", width: "100%", height: 20,
+            color: "var(--text-dark)", fontSize: "var(--fs-xs)",
+            fontFamily: "var(--font-main)", marginTop: 12,
           }}>
-            <span>1</span><span>5</span><span>10</span>
+            <span style={{ position: "absolute", left: 0 }}>1</span>
+            <span style={{ 
+              position: "absolute", 
+              left: `${(4/9) * 100}%`, 
+              transform: "translateX(-50%)",
+              color: count === 5 ? "var(--primary)" : "var(--text-dark)",
+              fontWeight: count === 5 ? 700 : 400,
+              transition: "all 0.2s"
+            }}>5</span>
+            <span style={{ position: "absolute", right: 0 }}>10</span>
           </div>
         </div>
 
