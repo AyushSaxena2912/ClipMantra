@@ -33,17 +33,17 @@ const JobRow = ({ job, onClick }) => {
           whiteSpace: "nowrap", maxWidth: 400,
         }}>{job.url}</p>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
+          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)" }}>
             {timeAgo(job.created_at)}
           </span>
           <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)" }}>·</span>
-          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
+          <span style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)" }}>
             {job.clip_count} clips requested
           </span>
           {job.status === "completed" && clips.length > 0 && (
             <>
               <span style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)" }}>·</span>
-              <span style={{ color: "#00e599", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif" }}>
+              <span style={{ color: "var(--primary)", fontSize: "var(--fs-xs)" }}>
                 {clips.length} clips ready
               </span>
             </>

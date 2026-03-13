@@ -21,7 +21,7 @@ const EyeIcon = ({ show }) => (
 
 const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-    <label style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>
+    <label style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", fontFamily: "var(--font-main)", letterSpacing: 1, textTransform: "uppercase" }}>
       {label}
     </label>
     <div style={{ position: "relative" }}>
@@ -73,10 +73,10 @@ const PasswordInput = ({ label, value, onChange, placeholder, show, onToggle }) 
 const linkBtn = {
   background: "none", border: "none", color: "var(--text-muted)",
   cursor: "pointer", fontSize: "var(--fs-sm)",
-  fontFamily: "'Montserrat', sans-serif", padding: 0,
+  fontFamily: "var(--font-main)", padding: 0,
 };
 
-const AuthPage = ({ onLogin, toast }) => {
+const AuthPage = ({ onLogin, toast, onBack }) => {
   const [mode, setMode] = useState("login");
   const [f, setF] = useState({ name: "", email: "", password: "", confirm: "", otp: "", newPass: "", confirmNew: "" });
   const [loading, setLoading] = useState(false);
@@ -207,6 +207,19 @@ const AuthPage = ({ onLogin, toast }) => {
       }} />
 
       <div style={{ width: "100%", maxWidth: 420, position: "relative", zIndex: 1 }} className="flex flex-col items-center">
+        {onBack && (
+          <button onClick={onBack} style={{
+            background: "none", border: "none", color: "var(--text-dim)",
+            cursor: "pointer", fontSize: "var(--fs-sm)", fontFamily: "var(--font-main)",
+            alignSelf: "flex-start", marginBottom: 24, padding: 0,
+            transition: "color 0.2s",
+          }}
+            onMouseEnter={(e) => e.target.style.color = "var(--text-muted)"}
+            onMouseLeave={(e) => e.target.style.color = "var(--text-dim)"}
+          >
+            ← Back to home
+          </button>
+        )}
         <div className="text-center" style={{ marginBottom: 48 }}>
           <div className="flex items-center justify-center" style={{ gap: 10, marginBottom: 12 }}>
             <span className="logo-text" style={{ fontSize: "var(--fs-4xl)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em" }}>ClipMantra</span>
@@ -217,7 +230,7 @@ const AuthPage = ({ onLogin, toast }) => {
         </div>
 
         <div className="card" style={{ padding: "40px", boxShadow: "0 40px 80px rgba(0,0,0,0.6)", width: "100%" }}>
-          <div style={{ minHeight: 400, display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <h2 style={{ fontSize: "var(--fs-2xl)", fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>
               {titles[mode]}
             </h2>

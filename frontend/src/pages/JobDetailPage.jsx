@@ -131,7 +131,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
             {streaming && (
               <span
                 style={{
-                  color: "#00e599",
+                  color: "var(--primary)",
                   fontSize: "var(--fs-xs)",
                   fontFamily: 'var(--font-main)',
                   animation: "pulse 1.5s infinite",
@@ -159,10 +159,10 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               onClick={startStream}
               style={{
                 padding: "10px 18px",
-                background: "#16161a",
-                border: "1px solid #00e59933",
-                borderRadius: 10,
-                color: "#00e599",
+                background: "var(--bg-input)",
+                border: "1px solid rgba(0, 229, 153, 0.2)",
+                borderRadius: "var(--radius-sm)",
+                color: "var(--primary)",
                 cursor: "pointer",
                 fontFamily: 'var(--font-main)',
                 fontSize: "var(--fs-sm)",
@@ -185,7 +185,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
               const done = i < currentStep || liveStatus === "completed";
               const active =
                 i === currentStep && liveStatus !== "completed";
-              const color = done ? "#00e599" : active ? "var(--accent-orange)" : "#222";
+              const color = done ? "var(--primary)" : active ? "var(--accent-orange)" : "var(--border-color)";
 
               return (
                 <div
@@ -213,10 +213,10 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         height: 28,
                         borderRadius: "50%",
                         background: done
-                          ? "#00e59915"
+                          ? "rgba(0, 229, 153, 0.08)"
                           : active
                             ? "rgba(255, 153, 0, 0.1)"
-                            : "#111",
+                            : "var(--bg-input)",
                         border: `2px solid ${color}`,
                         display: "flex",
                         alignItems: "center",
@@ -260,8 +260,8 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                         flex: 1,
                         height: 2,
                         background: done
-                          ? "#00e59933"
-                          : "#1a1a24",
+                          ? "rgba(0, 229, 153, 0.2)"
+                          : "var(--bg-card)",
                         margin: "0 4px",
                         marginBottom: 22,
                       }}
@@ -316,13 +316,13 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
                       href={videoUrl}
                       download={`clip_${i + 1}.mp4`}
                       style={{
-                        background: "rgba(240, 48, 80, 0.1)",
+                        background: "rgba(0, 229, 153, 0.1)",
                         border: "1px solid var(--primary)",
-                        borderRadius: 8,
+                        borderRadius: "var(--radius-sm)",
                         color: "var(--primary)",
                         padding: "6px 14px",
                         fontSize: "var(--fs-xs)",
-                        fontFamily: "'Montserrat', sans-serif",
+                        fontFamily: "var(--font-main)",
                         textDecoration: "none",
                         fontWeight: 600,
                         transition: 'all 0.2s'

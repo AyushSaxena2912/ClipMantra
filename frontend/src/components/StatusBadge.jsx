@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
       padding: "3px 10px", borderRadius: 20,
       background: s.bg, color: s.color,
       border: `1px solid ${s.color}33`,
-      fontFamily: "'Montserrat', sans-serif",
+      fontFamily: "var(--font-main)",
       fontSize: 10, fontWeight: 600, letterSpacing: 1.5,
     }}>
       <span style={{

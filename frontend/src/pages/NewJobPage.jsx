@@ -39,7 +39,7 @@ const NewJobPage = ({ onJobCreated, toast }) => {
         <div style={{ marginBottom: 24 }}>
           <label style={{
             display: "block", color: "var(--text-dim)", fontSize: "var(--fs-xs)",
-            fontFamily: "'Montserrat', sans-serif", letterSpacing: 1.5,
+            fontFamily: "var(--font-main)", letterSpacing: 1.5,
             textTransform: "uppercase", marginBottom: 8,
           }}>YouTube URL</label>
           <input
@@ -63,7 +63,7 @@ const NewJobPage = ({ onJobCreated, toast }) => {
         <div style={{ marginBottom: 28 }}>
           <label style={{
             display: "block", color: "var(--text-dim)", fontSize: "var(--fs-xs)",
-            fontFamily: "'Montserrat', sans-serif", letterSpacing: 1.5,
+            fontFamily: "var(--font-main)", letterSpacing: 1.5,
             textTransform: "uppercase", marginBottom: 12,
           }}>
             Number of Clips: <span style={{ color: "var(--primary)" }}>{count}</span>
@@ -76,7 +76,7 @@ const NewJobPage = ({ onJobCreated, toast }) => {
           <div style={{
             display: "flex", justifyContent: "space-between",
             color: "var(--text-dim)", fontSize: "var(--fs-xs)",
-            fontFamily: "'Montserrat', sans-serif", marginTop: 6,
+            fontFamily: "var(--font-main)", marginTop: 6,
           }}>
             <span>1</span><span>5</span><span>10</span>
           </div>
@@ -85,9 +85,9 @@ const NewJobPage = ({ onJobCreated, toast }) => {
         {/* Pipeline Preview - Only shown during submission/processing */}
         {loading && (
           <div style={{
-            marginBottom: 24, padding: '20px', background: '#080810', borderRadius: 10, border: '1px solid #1e1e2e'
+            marginBottom: 24, padding: '20px', background: 'var(--bg-sidebar)', borderRadius: "var(--radius-sm)", border: '1px solid var(--border-color)'
           }}>
-            <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 16px" }}>
+            <p className="section-label" style={{ margin: "0 0 16px" }}>
               Pipeline
             </p>
             <div className="flex flex-col">
@@ -111,7 +111,7 @@ const NewJobPage = ({ onJobCreated, toast }) => {
 
                   <div style={{ paddingBottom: i < steps.length - 1 ? 16 : 0 }}>
                     <p className="font-syne" style={{ color: "var(--text-main)", fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", margin: "0 0 2px" }}>{title}</p>
-                    <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif", margin: 0 }}>{desc}</p>
+                    <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-xs)", fontFamily: "var(--font-main)", margin: 0 }}>{desc}</p>
                   </div>
                 </div>
               ))}
@@ -127,7 +127,7 @@ const NewJobPage = ({ onJobCreated, toast }) => {
         >
           {loading ? "Creating job..." : "Start Clipping →"}
         </button>
-        <p style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontFamily: "'Montserrat', sans-serif", textAlign: "center", marginTop: 12 }}>
+        <p style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontFamily: "var(--font-main)", textAlign: "center", marginTop: 12 }}>
           Max 10 jobs per hour
         </p>
       </div>

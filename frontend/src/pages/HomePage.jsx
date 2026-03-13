@@ -1,23 +1,6 @@
-import JobRow from "../components/JobRow";
 import JobCard from "../components/JobCard";
-
-const LoadingState = () => (
-  <div style={{ padding: "60px 0", textAlign: "center" }}>
-    <div style={{
-      width: 32, height: 32,
-      border: "2px solid var(--border-color)", borderTopColor: "var(--primary)",
-      borderRadius: "50%", animation: "spin 0.8s linear infinite",
-      margin: "0 auto 16px",
-    }} />
-    <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-sm)" }}>Loading...</p>
-  </div>
-);
-
-const EmptyState = ({ label }) => (
-  <div style={{ padding: "60px 0", textAlign: "center", border: "1px dashed #1e1e2e", borderRadius: 14 }}>
-    <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-base)" }}>{label}</p>
-  </div>
-);
+import LoadingSpinner from "../components/LoadingSpinner";
+import EmptyState from "../components/EmptyState";
 
 const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
   const stats = {
@@ -30,11 +13,9 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
   return (
     <div>
       <div className="flex flex-col gap-xl">
-        <div>
+        <div className="page-header">
           <h1>Dashboard</h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "var(--fs-sm)" }}>
-            Extract viral clips from any YouTube video using AI
-          </p>
+          <p>Extract viral clips from any YouTube video using AI</p>
         </div>
 
         {/* Stats */}
@@ -46,10 +27,9 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
             { label: "Failed", value: stats.failed, color: "var(--accent-red)", glow: "rgba(255, 59, 59, 0.3)" },
           ].map((s) => (
             <div key={s.label} className="card stat-card" style={{
-              padding: "24px",
+              padding: "var(--spacing-md)",
               '--glow-color': s.glow,
               border: '1px solid var(--border-muted)',
-              boxShadow: 'var(--shadow-sm)'
             }}>
               <p style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 16px" }}>
                 {s.label}
@@ -68,7 +48,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
         <div className="card stat-card quick-create-banner" style={{
           background: "linear-gradient(135deg, rgba(0, 229, 153, 0.05), rgba(18, 18, 22, 0.4))",
           border: "1px solid rgba(0, 229, 153, 0.15)",
-          padding: "40px",
+          padding: "var(--spacing-xl)",
           '--glow-color': 'rgba(0, 229, 153, 0.15)',
           position: "relative"
         }}>
@@ -102,7 +82,7 @@ const HomePage = ({ jobs, loading, onNewJob, onViewJob, onViewAll }) => {
             </button>
           </div>
 
-          {loading ? <LoadingState /> : jobs.length === 0
+          {loading ? <LoadingSpinner /> : jobs.length === 0
             ? <EmptyState label="No jobs yet. Create your first one!" />
             : (
               <div style={{

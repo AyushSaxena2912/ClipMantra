@@ -7,21 +7,29 @@ import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [page, setPage] = useState("auth"); // "auth" | "dashboard"
   const [booted, setBooted] = useState(false);
   const { toasts, add: toast } = useToast();
 
   useEffect(() => {
     const u = getUser();
-    if (u) setUser(u);
+    if (u) {
+      setUser(u);
+      setPage("dashboard");
+    }
     setBooted(true);
   }, []);
 
-  const handleLogin = (u) => setUser(u);
+  const handleLogin = (u) => {
+    setUser(u);
+    setPage("dashboard");
+  };
 
   const handleLogout = () => {
     removeToken();
     removeUser();
     setUser(null);
+    setPage("auth");
     toast("Signed out.", "info");
   };
 
@@ -31,10 +39,12 @@ export default function App() {
     <>
       <Toasts toasts={toasts} />
 
-      {!user
-        ? <AuthPage onLogin={handleLogin} toast={toast} />
-        : <Dashboard user={user} onLogout={handleLogout} toast={toast} />
-      }
+      {page === "auth" && (
+        <AuthPage onLogin={handleLogin} toast={toast} />
+      )}
+      {page === "dashboard" && (
+        <Dashboard user={user} onLogout={handleLogout} toast={toast} />
+      )}
     </>
   );
 }

@@ -21,51 +21,47 @@ const SettingsPage = ({ user, toast, onLogout }) => {
 
   return (
     <div style={{ maxWidth: 520 }} className="flex flex-col gap-lg">
-      <div>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 6px" }}>
-          Settings
-        </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: 12 }}>
-          Manage your account
-        </p>
+      <div className="page-header">
+        <h1>Settings</h1>
+        <p>Manage your account</p>
       </div>
 
       {/* Profile Card */}
-      <div className="card" style={{ padding: 28 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>Profile</h2>
+      <div className="card" style={{ padding: "var(--spacing-md)" }}>
+        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--text-main)", margin: "0 0 20px" }}>Profile</h2>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <div className="font-syne flex items-center justify-center" style={{
             width: 52, height: 52,
             background: "linear-gradient(135deg, var(--primary), var(--accent-blue))",
-            borderRadius: 14, fontSize: 20, fontWeight: 800,
+            borderRadius: 14, fontSize: "var(--fs-2xl)", fontWeight: 800,
             color: "#000",
           }}>
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div>
-            <p className="font-syne" style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: "0 0 2px" }}>{user?.name}</p>
-            <p style={{ color: "var(--text-dim)", fontSize: 12, margin: 0 }}>{user?.email}</p>
+            <p className="font-syne" style={{ color: "var(--text-main)", fontSize: "var(--fs-lg)", fontWeight: 700, margin: "0 0 2px" }}>{user?.name}</p>
+            <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)", margin: 0 }}>{user?.email}</p>
           </div>
         </div>
       </div>
 
       {/* Change Password */}
-      <div className="card" style={{ padding: 28 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>
+      <div className="card" style={{ padding: "var(--spacing-md)" }}>
+        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--text-main)", margin: "0 0 20px" }}>
           Change Password
         </h2>
         <div className="flex flex-col" style={{ gap: 14 }}>
           <Input label="Current Password" type="password" value={f.old} onChange={set("old")} placeholder="••••••••" />
           <Input label="New Password" type="password" value={f.newp} onChange={set("newp")} placeholder="••••••••" />
           <Input label="Confirm New Password" type="password" value={f.confirm} onChange={set("confirm")} placeholder="••••••••" />
-          <p style={{ color: "var(--text-dim)", fontSize: 11, margin: 0 }}>
+          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", margin: 0 }}>
             8-15 chars · uppercase · lowercase · number · special (@$!%*?&)
           </p>
           <button
             onClick={changePassword}
             disabled={loading}
-            className="btn-primary"
-            style={{ width: "100%", background: loading ? "#111" : "var(--bg-dark)", border: "1px solid var(--border-color)", color: loading ? "var(--text-dim)" : "var(--primary)" }}
+            className="btn-secondary"
+            style={{ width: "100%" }}
           >
             {loading ? "Updating..." : "Update Password"}
           </button>
@@ -73,22 +69,14 @@ const SettingsPage = ({ user, toast, onLogout }) => {
       </div>
 
       {/* Sign Out */}
-      <div className="card" style={{ background: "#100000", border: "1px solid rgba(255, 59, 59, 0.1)", padding: 28 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--accent-red)", margin: "0 0 12px" }}>
+      <div className="card" style={{ background: "rgba(255, 59, 59, 0.03)", border: "1px solid rgba(255, 59, 59, 0.1)", padding: "var(--spacing-md)" }}>
+        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--accent-red)", margin: "0 0 12px" }}>
           Sign Out
         </h2>
-        <p style={{ color: "var(--text-dim)", fontSize: 12, margin: "0 0 16px" }}>
+        <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)", margin: "0 0 16px" }}>
           You'll need to sign in again to access your jobs.
         </p>
-        <button
-          onClick={onLogout}
-          style={{
-            padding: "11px 24px", background: "transparent",
-            border: "1px solid #ff3b3b44", borderRadius: 10,
-            color: "#ff3b3b", cursor: "pointer",
-            fontFamily: "'Montserrat', sans-serif", fontSize: 13,
-          }}
-        >
+        <button onClick={onLogout} className="btn-danger">
           Sign Out
         </button>
       </div>
