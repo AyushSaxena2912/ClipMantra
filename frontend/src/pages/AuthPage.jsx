@@ -130,16 +130,24 @@ const AuthPage = ({ onLogin, toast, onBack }) => {
     if (window.google) {
       window.google.accounts.id.prompt((notification) => {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Fallback: use popup mode via oauth2
-          const client = window.google.accounts.oauth2.initCodeClient({
+          // Fallback: use token client which gives access_token, then get ID token via tokeninfo
+          const tokenClient = window.google.accounts.oauth2.initTokenClient({
             client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-            scope: "email profile",
-            ux_mode: "popup",
-            callback: (response) => {
-              handleGoogleLogin({ credential: response.code });
+            scope: "email profile openid",
+            callback: async (tokenResponse) => {
+              if (tokenResponse.access_token) {
+                // Get ID token via userinfo
+                const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                });
+                const userInfo = await userInfoRes.json();
+                // Use access token as token for backend (backend will need to handle this)
+                // For now, show an error asking user to try One Tap again
+                toast("Please try signing in again using the Google prompt", "error");
+              }
             },
           });
-          client.requestCode();
+          tokenClient.requestAccessToken({ prompt: "consent" });
         }
       });
     }
