@@ -563,16 +563,26 @@
 
 .landing-hero-pill {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.75rem;
   width: 100%;
   max-width: 34rem;
-  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-  border-radius: 9999px;
+  padding: 0.75rem;
+  border-radius: 1.25rem;
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   box-shadow: 0 0 0 1px hsl(var(--border) / 0.4), 0 8px 32px rgba(0, 0, 0, 0.35);
   transition: box-shadow 0.2s ease;
+}
+
+@media (min-width: 540px) {
+  .landing-hero-pill {
+    flex-direction: row;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+  }
 }
 
 .landing-hero-pill:hover {
@@ -644,6 +654,21 @@
 .landing-hero-pill-btn:hover {
   opacity: 0.92;
   transform: scale(1.02);
+}
+
+@media (max-width: 539px) {
+  .landing-hero-pill-input {
+    padding: 0.5rem;
+    text-align: center;
+  }
+  .landing-hero-pill-icon {
+    display: none;
+  }
+  .landing-hero-pill-btn {
+    width: 100%;
+    justify-content: center;
+    padding-block: 0.875rem;
+  }
 }
 
 .landing-hero-or {

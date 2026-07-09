@@ -92,18 +92,18 @@ export default function Features() {
           {FEATURES.map((feature) => (
             <motion.div key={feature.title} variants={fadeUp} transition={tween(0.45)}>
               <motion.div whileHover={{ y: -4 }} transition={tween(0.2)}>
-                <Card className="h-full border-border/60 bg-card/50 transition-colors hover:border-primary/30">
-              <CardHeader>
-                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <feature.icon />
-                </div>
-                <CardTitle className="text-base">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm leading-relaxed">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
+                <Card className="h-full border-border/40 bg-card/30 backdrop-blur-sm transition-all hover:border-primary/40 hover:bg-card/50 hover:shadow-2xl hover:shadow-primary/5">
+                  <CardHeader>
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 shadow-md shadow-primary/5">
+                      <feature.icon />
+                    </div>
+                    <CardTitle className="text-base font-bold">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
                 </Card>
               </motion.div>
             </motion.div>

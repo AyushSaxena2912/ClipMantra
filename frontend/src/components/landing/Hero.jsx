@@ -49,9 +49,9 @@ export default function Hero({ onGetStarted }) {
               #1 AI Video Clipping Tool
             </motion.p>
             <motion.h1 className="landing-hero-title" variants={fadeUp} transition={tween(0.55)}>
-              1 long video, 10 viral clips.
+              1 long video, <span className="text-gradient">10 viral clips.</span>
               <br />
-              Create 10x faster.
+              Create <span className="text-gradient-purple">10x faster.</span>
             </motion.h1>
             <motion.p className="landing-hero-sub" variants={fadeUp} transition={tween(0.5)}>
               ClipMantra turns long videos into Shorts, Reels, and TikToks — scored

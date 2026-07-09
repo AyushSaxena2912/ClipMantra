@@ -5,7 +5,7 @@ export default function CTA({ onGetStarted }) {
   return (
     <section className="landing-section pb-32">
       <div className="landing-container">
-        <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-10 text-center md:p-16">
+        <div className="rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/15 via-card to-card p-10 text-center md:p-16 shadow-2xl shadow-primary/5">
           <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
             Ready to extract viral clips?
           </h2>

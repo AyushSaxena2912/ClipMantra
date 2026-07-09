@@ -45,21 +45,21 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
+        <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8">
           {STEPS.map((step) => (
-            <div key={step.step} className="text-center md:text-left">
-              <div className="mb-6 flex items-center justify-center gap-4 md:justify-start">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
-                  <step.icon />
+            <div key={step.step} className="text-center md:text-left flex flex-col items-center md:items-start">
+              <div className="mb-6 flex items-center justify-center gap-5 md:justify-start w-full">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/20 to-primary/5 text-primary shadow-lg shadow-primary/10">
+                  <step.icon className="h-6 w-6" />
                 </div>
-                <span className="font-display text-4xl font-bold text-border">
+                <span className="font-display text-5xl font-extrabold text-border/20 select-none">
                   {step.step}
                 </span>
               </div>
 
               <Badge className="mb-3">{step.badge}</Badge>
 
-              <h3 className="text-lg font-semibold">{step.title}</h3>
+              <h3 className="text-lg font-bold">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>

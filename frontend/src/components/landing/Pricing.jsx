@@ -75,12 +75,12 @@ export default function Pricing({ onGetStarted }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 items-stretch">
           {PLANS.map((plan) => (
             <Card
               key={plan.name}
-              className={`relative flex flex-col border-border/60 bg-card/50 ${
-                plan.popular ? "border-primary/50 lg:mt-0" : ""
+              className={`relative flex flex-col h-full border-border/60 bg-card/50 ${
+                plan.popular ? "border-primary/50 ring-1 ring-primary/25 lg:mt-0" : ""
               }`}
             >
               {plan.popular && (
@@ -89,27 +89,27 @@ export default function Pricing({ onGetStarted }) {
                 </Badge>
               )}
               <CardHeader className={plan.popular ? "pt-8" : ""}>
-                <CardTitle className="text-lg">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardTitle className="text-lg font-bold">{plan.name}</CardTitle>
+                <CardDescription className="min-h-10">{plan.description}</CardDescription>
                 <div className="mt-4">
-                  <span className="font-display text-4xl font-bold">
+                  <span className="font-display text-4xl font-extrabold">
                     {plan.price}
                   </span>
                   <span className="text-muted-foreground">{plan.period}</span>
                 </div>
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col">
-                <ul className="mb-8 flex flex-1 flex-col gap-3">
+              <CardContent className="flex flex-1 flex-col justify-between">
+                <ul className="mb-8 flex flex-col gap-3">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm">
-                      <IconCheck className="mt-0.5 text-primary" />
+                      <IconCheck className="mt-0.5 text-primary shrink-0" />
                       <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 <Button
                   variant={plan.popular ? "default" : "outline"}
-                  className="w-full shadow-none"
+                  className="w-full shadow-none mt-auto"
                   onClick={onGetStarted}
                 >
                   {plan.cta}
