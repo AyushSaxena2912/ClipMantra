@@ -621,8 +621,6 @@ export const googleLogin = async (req: Request, res: Response) => {
     return res.status(401).json({
       success: false,
       message: "Google authentication failed",
-      debug: error?.message || String(error),
-      clientId: process.env.GOOGLE_CLIENT_ID ? "SET" : "NOT SET",
     });
   }
 };
