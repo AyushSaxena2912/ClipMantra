@@ -156,27 +156,27 @@
   background-clip: text;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+.app-shell h1,
+.app-shell h2,
+.app-shell h3,
+.app-shell h4,
+.app-shell h5,
+.app-shell h6 {
   font-family: 'Montserrat', sans-serif;
   font-weight: var(--fw-extrabold);
   line-height: 1.2;
   margin: 0;
 }
 
-h1 {
+.app-shell h1 {
   font-size: var(--fs-5xl);
 }
 
-h2 {
+.app-shell h2 {
   font-size: var(--fs-3xl);
 }
 
-h3 {
+.app-shell h3 {
   font-size: var(--fs-xl);
 }
 
@@ -245,40 +245,40 @@ body {
   border-radius: 4px;
 }
 
-/* Utilities */
-.flex {
+/* Utilities — scoped to dashboard/auth */
+.app-shell .flex {
   display: flex;
 }
 
-.flex-col {
+.app-shell .flex-col {
   flex-direction: column;
 }
 
-.flex-1 {
+.app-shell .flex-1 {
   flex: 1;
 }
 
-.items-center {
+.app-shell .items-center {
   align-items: center;
 }
 
-.justify-between {
+.app-shell .justify-between {
   justify-content: space-between;
 }
 
-.justify-center {
+.app-shell .justify-center {
   justify-content: center;
 }
 
-.text-center {
+.app-shell .text-center {
   text-align: center;
 }
 
-.w-full {
+.app-shell .w-full {
   width: 100%;
 }
 
-.mx-auto {
+.app-shell .mx-auto {
   margin-left: auto;
   margin-right: auto;
 }
@@ -299,71 +299,71 @@ body {
   gap: var(--spacing-xl);
 }
 
-/* Typography Utilities */
-.text-xs {
+/* Typography Utilities — scoped to dashboard/auth only */
+.app-shell .text-xs {
   font-size: var(--fs-xs) !important;
 }
 
-.text-sm {
+.app-shell .text-sm {
   font-size: var(--fs-sm) !important;
 }
 
-.text-base {
+.app-shell .text-base {
   font-size: var(--fs-base) !important;
 }
 
-.text-lg {
+.app-shell .text-lg {
   font-size: var(--fs-lg) !important;
 }
 
-.text-xl {
+.app-shell .text-xl {
   font-size: var(--fs-xl) !important;
 }
 
-.text-2xl {
+.app-shell .text-2xl {
   font-size: var(--fs-2xl) !important;
 }
 
-.font-light {
+.app-shell .font-light {
   font-weight: var(--fw-light) !important;
 }
 
-.font-regular {
+.app-shell .font-regular {
   font-weight: var(--fw-regular) !important;
 }
 
-.font-medium {
+.app-shell .font-medium {
   font-weight: var(--fw-medium) !important;
 }
 
-.font-semibold {
+.app-shell .font-semibold {
   font-weight: var(--fw-semibold) !important;
 }
 
-.font-bold {
+.app-shell .font-bold {
   font-weight: var(--fw-bold) !important;
 }
 
-.font-extrabold {
+.app-shell .font-extrabold {
   font-weight: var(--fw-extrabold) !important;
 }
 
-.grid {
+.app-shell .grid {
   display: grid;
 }
 
-.grid-cols-4 {
+.app-shell .grid-cols-4 {
   grid-template-columns: repeat(4, 1fr);
 }
 
 @media (max-width: 1024px) {
-  .grid-cols-4 {
+  .app-shell .grid-cols-4 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
-  .grid-cols-4 {
+  .app-shell .grid-cols-4 {
     grid-template-columns: 1fr;
   }
 }
