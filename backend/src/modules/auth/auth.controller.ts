@@ -541,21 +541,47 @@ export const googleLogin = async (req: Request, res: Response) => {
       });
     }
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let email: string | undefined;
+    let name: string | undefined;
 
-    const payload = ticket.getPayload();
-
-    if (!payload || !payload.email) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Google token",
+    // Check if it's an access token (starts with ya29.) or ID token
+    if (token.startsWith("ya29.")) {
+      // Access token flow — verify via Google userinfo endpoint
+      const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!userInfoRes.ok) {
+        return res.status(401).json({ success: false, message: "Invalid Google access token" });
+      }
+
+      const userInfo = await userInfoRes.json();
+      email = userInfo.email;
+      name = userInfo.name;
+
+    } else {
+      // ID token flow — verify via google-auth-library
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+
+      if (!payload || !payload.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid Google token",
+        });
+      }
+
+      email = payload.email;
+      name = payload.name;
     }
 
-    const { email, name, picture } = payload;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Could not get email from Google" });
+    }
 
     // Check if user exists
     let user = await findUserByEmail(email);
@@ -568,7 +594,7 @@ export const googleLogin = async (req: Request, res: Response) => {
         VALUES ($1, $2, $3, $4)
         RETURNING id, name, email
         `,
-        [uuidv4(), name, email, "google"]
+        [uuidv4(), name || email.split("@")[0], email, "google"]
       );
 
       user = result.rows[0];

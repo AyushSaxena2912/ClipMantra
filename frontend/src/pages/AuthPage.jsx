@@ -108,7 +108,19 @@ const AuthPage = ({ onLogin, toast, onBack }) => {
         window.google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleGoogleLogin,
+          use_fedcm_for_prompt: false,
         });
+
+        // Render official Google button in hidden container
+        const container = document.getElementById("google-signin-container");
+        if (container) {
+          window.google.accounts.id.renderButton(container, {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            width: 300,
+          });
+        }
       }
     };
 
@@ -127,29 +139,32 @@ const AuthPage = ({ onLogin, toast, onBack }) => {
   }, [mode]);
 
   const handleCustomGoogleClick = () => {
-    if (window.google) {
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Fallback: use token client which gives access_token, then get ID token via tokeninfo
-          const tokenClient = window.google.accounts.oauth2.initTokenClient({
-            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-            scope: "email profile openid",
-            callback: async (tokenResponse) => {
-              if (tokenResponse.access_token) {
-                // Get ID token via userinfo
-                const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-                });
-                const userInfo = await userInfoRes.json();
-                // Use access token as token for backend (backend will need to handle this)
-                // For now, show an error asking user to try One Tap again
-                toast("Please try signing in again using the Google prompt", "error");
-              }
-            },
-          });
-          tokenClient.requestAccessToken({ prompt: "consent" });
-        }
+    // Click the hidden official Google button
+    const googleBtn = document.querySelector("#google-signin-container div[role='button']");
+    if (googleBtn) {
+      googleBtn.click();
+    } else if (window.google) {
+      // Fallback: use access token flow
+      const tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        scope: "email profile openid",
+        callback: async (tokenResponse) => {
+          if (tokenResponse.access_token) {
+            setLoading(true);
+            try {
+              const r = await api("/auth/google", {
+                method: "POST",
+                body: JSON.stringify({ token: tokenResponse.access_token }),
+              });
+              if (r.ok) { saveToken(r.data.token); saveUser(r.data.user); onLogin(r.data.user); toast("Welcome!", "success"); }
+              else toast(r.data.message || "Google login failed", "error");
+            } finally {
+              setLoading(false);
+            }
+          }
+        },
       });
+      tokenClient.requestAccessToken({ prompt: "select_account" });
     }
   };
 
@@ -316,6 +331,8 @@ const AuthPage = ({ onLogin, toast, onBack }) => {
                     <span style={{ color: "var(--text-dark)", fontSize: "var(--fs-xs)", fontWeight: 600 }}>OR</span>
                     <div style={{ flex: 1, height: 1, background: "var(--border-color)" }} />
                   </div>
+                  {/* Hidden official Google button - clicked programmatically */}
+                  <div id="google-signin-container" style={{ display: "none" }} />
                   <button
                     type="button"
                     onClick={handleCustomGoogleClick}
