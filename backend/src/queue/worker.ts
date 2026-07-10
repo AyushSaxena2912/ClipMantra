@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { exec, spawn, ChildProcess } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 import axios from "axios";
@@ -12,6 +12,11 @@ const execAsync = promisify(exec);
 const role = process.argv[2];
 
 const ytDlpCmd = process.env.YTDLP_PATH || "/usr/local/bin/yt-dlp";
+
+const BGUTIL_PORT = process.env.BGUTIL_PORT || "4416";
+const BGUTIL_SCRIPT =
+  process.env.BGUTIL_PROVIDER_SCRIPT ||
+  "/opt/bgutil-provider/server/build/main.js";
 
 if (!["download", "transcribe", "render"].includes(role)) {
   console.error("Provide worker role: download | transcribe | render");
@@ -31,6 +36,70 @@ const publishStatus = async (jobId: string, status: string) => {
   await redis.publish(`job:${jobId}`, JSON.stringify({ status }));
 };
 
+/**
+ * yt-dlp's "web" YouTube client now requires a PO (proof-of-origin) token to
+ * get real video formats — without it, YouTube only returns image/storyboard
+ * formats ("Only images are available for download"). This starts the
+ * bgutil-ytdlp-pot-provider HTTP server (which yt-dlp's plugin talks to on
+ * 127.0.0.1:4416) as a background child process and restarts it if it dies.
+ */
+const startBgutilProvider = () => {
+  if (!fs.existsSync(BGUTIL_SCRIPT)) {
+    console.warn(
+      `[BGUTIL] Provider script not found at ${BGUTIL_SCRIPT} — ` +
+      "PO tokens won't be available; YouTube downloads may be limited to image formats."
+    );
+    return;
+  }
+
+  let child: ChildProcess | null = null;
+  let shuttingDown = false;
+
+  const spawnServer = () => {
+    child = spawn("node", [BGUTIL_SCRIPT, "--port", BGUTIL_PORT], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    child.stdout?.on("data", (d) => process.stdout.write(`[BGUTIL] ${d}`));
+    child.stderr?.on("data", (d) => process.stderr.write(`[BGUTIL] ${d}`));
+
+    child.on("exit", (code) => {
+      if (shuttingDown) return;
+      console.warn(`[BGUTIL] Provider exited (code ${code}). Restarting in 3s...`);
+      setTimeout(spawnServer, 3000);
+    });
+  };
+
+  spawnServer();
+
+  const shutdown = () => {
+    shuttingDown = true;
+    child?.kill();
+  };
+  process.on("exit", shutdown);
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+};
+
+const waitForBgutilProvider = async (timeoutMs = 20000) => {
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    try {
+      await axios.get(`http://127.0.0.1:${BGUTIL_PORT}/ping`, { timeout: 1000 });
+      console.log("[BGUTIL] Provider is up.");
+      return;
+    } catch {
+      await new Promise((res) => setTimeout(res, 500));
+    }
+  }
+
+  console.warn(
+    "[BGUTIL] Provider did not become reachable in time — " +
+    "continuing without it (downloads may fail or be format-limited)."
+  );
+};
+
 const ensureFolders = () => {
   const folders = [
     "storage/videos",
@@ -48,6 +117,11 @@ const ensureFolders = () => {
 };
 
 const startWorker = async () => {
+
+  if (role === "download") {
+    startBgutilProvider();
+    await waitForBgutilProvider();
+  }
 
   if (process.env.YOUTUBE_COOKIES_BASE64) {
     let cookiesContent = Buffer.from(
@@ -132,7 +206,10 @@ const startWorker = async () => {
 
         await execAsync(
           `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=web" ` +
+          // "web" needs a PO token (served by the bgutil provider above) for
+          // real formats; "tv" is included as a fallback that works with
+          // cookies even if the PO token provider is unavailable.
+          `--extractor-args "youtube:player_client=web,tv" ` +
           `--add-header "User-Agent: Mozilla/5.0" ` +
           `--retries 10 --fragment-retries 10 ` +
           `-f "bv*[height<=1080]+ba/best" ` +
@@ -156,7 +233,7 @@ const startWorker = async () => {
 
         await execAsync(
           `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=web" ` +
+          `--extractor-args "youtube:player_client=web,tv" ` +
           `--add-header "User-Agent: Mozilla/5.0" ` +
           `-f "bestaudio/best" ` +
           `--extract-audio ` +
