@@ -100,6 +100,45 @@ const waitForBgutilProvider = async (timeoutMs = 20000) => {
   );
 };
 
+// YouTube periodically runs undisclosed A/B experiments that bind PO tokens
+// to a specific video/client combo, causing some (but not all) videos to
+// 403 on the actual media download even after format selection succeeds.
+// Rather than fail the whole job on the first client's 403, retry with a
+// handful of different player-client strategies before giving up.
+const YTDLP_CLIENT_FALLBACKS = ["web,tv", "tv", "android_vr,tv", "web_safari,tv"];
+
+const runYtDlpWithFallback = async (
+  buildCmd: (clientArg: string) => string,
+  jobId: string,
+  label: string
+) => {
+  let lastErr: any;
+
+  for (let i = 0; i < YTDLP_CLIENT_FALLBACKS.length; i++) {
+    const clients = YTDLP_CLIENT_FALLBACKS[i];
+    const isLast = i === YTDLP_CLIENT_FALLBACKS.length - 1;
+
+    try {
+      await execAsync(buildCmd(clients), {
+        timeout: 5 * 60 * 1000,
+        env: { ...process.env, PYTHONUTF8: "1" },
+      });
+      return;
+    } catch (err: any) {
+      lastErr = err;
+      log(
+        jobId,
+        `${label} failed with player_client="${clients}" ` +
+        `(attempt ${i + 1}/${YTDLP_CLIENT_FALLBACKS.length}).` +
+        (isLast ? " No more fallbacks left." : " Retrying with a different client...")
+      );
+      if (!isLast) await new Promise((res) => setTimeout(res, 2000));
+    }
+  }
+
+  throw lastErr;
+};
+
 const ensureFolders = () => {
   const folders = [
     "storage/videos",
@@ -203,24 +242,25 @@ const startWorker = async () => {
           : "";
 
         // VIDEO DOWNLOAD
+        // "web" needs a PO token (served by the bgutil provider above) for
+        // real formats. If that specific client/token combo gets 403'd by a
+        // YouTube-side experiment, runYtDlpWithFallback retries with other
+        // player clients before giving up. AV1-only formats are avoided
+        // first since they tend to need the strictest token verification.
 
-        await execAsync(
-          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          // "web" needs a PO token (served by the bgutil provider above) for
-          // real formats; "tv" is included as a fallback that works with
-          // cookies even if the PO token provider is unavailable.
-          `--extractor-args "youtube:player_client=web,tv" ` +
-          `--add-header "User-Agent: Mozilla/5.0" ` +
-          `--retries 10 --fragment-retries 10 ` +
-          `-f "bv*[height<=1080]+ba/best" ` +
-          `--merge-output-format mp4 ` +
-          `--no-playlist ` +
-          `-o "${videoPath}" ` +
-          `"${jobData.url}"`,
-          { 
-            timeout: 5 * 60 * 1000,
-            env: { ...process.env, PYTHONUTF8: "1" }
-          }
+        await runYtDlpWithFallback(
+          (clients) =>
+            `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
+            `--extractor-args "youtube:player_client=${clients}" ` +
+            `--add-header "User-Agent: Mozilla/5.0" ` +
+            `--retries 10 --fragment-retries 10 ` +
+            `-f "bv*[height<=1080][vcodec!*=av01]+ba/best/bv*[height<=1080]+ba/best" ` +
+            `--merge-output-format mp4 ` +
+            `--no-playlist ` +
+            `-o "${videoPath}" ` +
+            `"${jobData.url}"`,
+          jobId,
+          "Video download"
         );
 
         const stats = fs.statSync(videoPath);
@@ -231,21 +271,20 @@ const startWorker = async () => {
 
         // AUDIO DOWNLOAD
 
-        await execAsync(
-          `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
-          `--extractor-args "youtube:player_client=web,tv" ` +
-          `--add-header "User-Agent: Mozilla/5.0" ` +
-          `-f "bestaudio/best" ` +
-          `--extract-audio ` +
-          `--audio-format mp3 ` +
-          `--audio-quality 192K ` +
-          `--no-playlist ` +
-          `-o "${audioPath}" ` +
-          `"${jobData.url}"`,
-          { 
-            timeout: 5 * 60 * 1000,
-            env: { ...process.env, PYTHONUTF8: "1" }
-          }
+        await runYtDlpWithFallback(
+          (clients) =>
+            `${ytDlpCmd} ${proxyArg} ${cookiesArg} ` +
+            `--extractor-args "youtube:player_client=${clients}" ` +
+            `--add-header "User-Agent: Mozilla/5.0" ` +
+            `-f "bestaudio/best" ` +
+            `--extract-audio ` +
+            `--audio-format mp3 ` +
+            `--audio-quality 192K ` +
+            `--no-playlist ` +
+            `-o "${audioPath}" ` +
+            `"${jobData.url}"`,
+          jobId,
+          "Audio download"
         );
 
         const videoUrlR2 = await uploadToR2(videoPath, `videos/${jobId}.mp4`);

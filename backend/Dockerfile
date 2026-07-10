@@ -28,6 +28,10 @@
 
 FROM node:22-slim
 
+# NOTE: we deliberately use yt-dlp's nightly ("master-builds") releases here
+# instead of the stable channel. YouTube frequently ships anti-bot changes
+# that break downloads within days, and fixes for those land in nightly
+# builds well before they reach a stable release.
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
@@ -36,7 +40,7 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     && curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh \
-    && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && curl -L https://github.com/yt-dlp/yt-dlp-master-builds/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
     && chmod a+rx /usr/local/bin/yt-dlp \
     && pip3 install "bgutil-ytdlp-pot-provider==1.3.1" --break-system-packages \
     && apt-get clean \
