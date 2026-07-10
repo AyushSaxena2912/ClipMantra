@@ -122,7 +122,10 @@ const startWorker = async () => {
           `--no-playlist ` +
           `-o "${videoPath}" ` +
           `"${jobData.url}"`,
-          { timeout: 5 * 60 * 1000 }
+          { 
+            timeout: 5 * 60 * 1000,
+            env: { ...process.env, PYTHONUTF8: "1" }
+          }
         );
 
         const stats = fs.statSync(videoPath);
@@ -144,7 +147,10 @@ const startWorker = async () => {
           `--no-playlist ` +
           `-o "${audioPath}" ` +
           `"${jobData.url}"`,
-          { timeout: 5 * 60 * 1000 }
+          { 
+            timeout: 5 * 60 * 1000,
+            env: { ...process.env, PYTHONUTF8: "1" }
+          }
         );
 
         const videoUrlR2 = await uploadToR2(videoPath, `videos/${jobId}.mp4`);
