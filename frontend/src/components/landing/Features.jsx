@@ -19,21 +19,21 @@ import { fadeUp, inViewProps, stagger, tween } from "@/lib/motion";
 const FEATURES = [
   {
     icon: IconBrain,
-    title: "Gemini AI Detection",
+    title: "Advanced AI Detection",
     description:
-      "Google Gemini 2.5 Flash analyzes transcripts to find hooks, emotional peaks, and high-engagement moments with viral scores.",
+      "Our AI models analyze transcripts to find hooks, emotional peaks, and high-engagement moments with viral scores.",
   },
   {
     icon: IconScissors,
     title: "Auto Clip Rendering",
     description:
-      "FFmpeg cuts and exports polished MP4 clips optimized for Shorts, Reels, and TikTok — no editing skills needed.",
+      "Our high-performance rendering engine cuts and exports polished MP4 clips optimized for Shorts, Reels, and TikTok — no editing skills needed.",
   },
   {
     icon: IconRadio,
     title: "Real-Time Progress",
     description:
-      "Watch your job pipeline live via SSE. Track download, transcription, AI analysis, and rendering in real time.",
+      "Watch your job pipeline live with instant, real-time updates. Track download, transcription, AI analysis, and rendering as it happens.",
   },
   {
     icon: IconGauge,

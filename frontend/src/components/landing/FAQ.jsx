@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: "How does the AI choose viral moments?",
-    a: "We transcribe the audio with Faster-Whisper, then Google Gemini 2.5 Flash analyzes the transcript for hooks, emotional peaks, surprising statements, and listicle patterns. Each clip gets a viral score with reasoning.",
+    a: "Our automated pipeline transcribes the audio, then our proprietary AI analysis engine evaluates the transcript for hooks, emotional peaks, surprising statements, and viral patterns. Each clip gets a viral score with reasoning.",
   },
   {
     q: "What format are the clips exported in?",
@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: "How long does processing take?",
-    a: "Most jobs complete in a few minutes depending on video length. You can track real-time progress on your dashboard via live SSE updates as the pipeline moves through download, transcription, and rendering.",
+    a: "Most jobs complete in a few minutes depending on video length. You can track real-time progress on your dashboard via live updates as the pipeline moves through download, transcription, and rendering.",
   },
   {
     q: "How long are my files stored?",

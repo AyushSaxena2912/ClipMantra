@@ -15,8 +15,8 @@ const STEPS = [
     icon: IconSparkles,
     title: "AI finds viral moments",
     description:
-      "Faster-Whisper transcribes the audio, then Gemini AI scores segments by hook strength, emotion, and engagement potential.",
-    badge: "Powered by Gemini",
+      "Our automated pipeline transcribes the audio, then advanced AI models score segments by hook strength, emotion, and engagement potential.",
+    badge: "AI Powered",
   },
   {
     step: "03",

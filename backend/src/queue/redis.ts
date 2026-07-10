@@ -1,15 +1,28 @@
 import Redis from "ioredis";
 
-// Main Redis client
-export const redis = new Redis(process.env.REDIS_URL!, {
+const redisOptions = {
   maxRetriesPerRequest: null,
-});
+  retryStrategy(times: number) {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+  reconnectOnError(err: Error) {
+    const targetError = "READONLY";
+    if (err.message.includes(targetError)) {
+      return true;
+    }
+    return false;
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+};
+
+// Main Redis client
+export const redis = new Redis(process.env.REDIS_URL!, redisOptions);
 
 // Separate Redis client for Pub/Sub
-export const redisSubscriber = new Redis(process.env.REDIS_URL!, {
-  maxRetriesPerRequest: null,
-});
-
+export const redisSubscriber = new Redis(process.env.REDIS_URL!, redisOptions);
 
 // CONNECTION LOGGING
 redis.on("connect", () => {
