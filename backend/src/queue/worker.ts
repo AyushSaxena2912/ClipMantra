@@ -50,10 +50,28 @@ const ensureFolders = () => {
 const startWorker = async () => {
 
   if (process.env.YOUTUBE_COOKIES_BASE64) {
-    const cookiesContent = Buffer.from(
+    let cookiesContent = Buffer.from(
       process.env.YOUTUBE_COOKIES_BASE64,
       "base64"
     ).toString("utf-8");
+
+    // HTTP header values (e.g. the "Cookie" header yt-dlp sends) must be
+    // Latin-1/ASCII per the HTTP spec — Python's http.client hard-codes a
+    // `.encode("latin-1")` on them regardless of locale/PYTHONUTF8. If
+    // YOUTUBE_COOKIES_BASE64 was corrupted or wasn't valid UTF-8 to begin
+    // with, decoding it here injects U+FFFD replacement characters (or other
+    // non-Latin-1 codepoints) into cookie values, which crashes yt-dlp deep
+    // inside Python with a cryptic "'latin-1' codec can't encode..." error.
+    // Strip anything outside Latin-1 so we fail soft (bad cookie value
+    // dropped) instead of crashing the whole download.
+    if (/[^\x00-\xFF]/.test(cookiesContent)) {
+      console.warn(
+        "[COOKIES] YOUTUBE_COOKIES_BASE64 decoded to non-Latin-1 characters " +
+        "(likely corrupted/mis-encoded env var). Stripping invalid characters " +
+        "— re-export a fresh cookies.txt if downloads keep failing auth checks."
+      );
+      cookiesContent = cookiesContent.replace(/[^\x00-\xFF]/g, "");
+    }
 
     fs.writeFileSync("/tmp/cookies.txt", cookiesContent);
     process.env.YOUTUBE_COOKIES_PATH = "/tmp/cookies.txt";
