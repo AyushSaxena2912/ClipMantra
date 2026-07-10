@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
     && curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh \
     && curl -L https://github.com/yt-dlp/yt-dlp-master-builds/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
     && chmod a+rx /usr/local/bin/yt-dlp \
-    && pip3 install "bgutil-ytdlp-pot-provider==1.3.1" --break-system-packages \
+    && pip3 install faster-whisper "bgutil-ytdlp-pot-provider==1.3.1" --break-system-packages \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
