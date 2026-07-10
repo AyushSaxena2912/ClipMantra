@@ -19,6 +19,18 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       : JSON.parse(job.clips_path || "[]")
     : [];
 
+  /* Always pull the latest job record on mount — the object handed down
+     from the dashboard list can be stale (e.g. the job finished rendering
+     clips while the user wasn't watching this page live via SSE). */
+  useEffect(() => {
+    api(`/jobs/${initialJob.id}`).then((r) => {
+      if (r.ok) {
+        setJob(r.data.data);
+        setLiveStatus(r.data.data.status);
+      }
+    });
+  }, [initialJob.id]);
+
   /* Load highlights */
   useEffect(() => {
     if (job.highlights_path) {

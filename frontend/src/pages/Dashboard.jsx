@@ -13,18 +13,43 @@ const Dashboard = ({ user, onLogout, toast }) => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [loadingJobs, setLoadingJobs] = useState(false);
 
-  const fetchJobs = useCallback(async () => {
-    setLoadingJobs(true);
+  const refetchJobs = useCallback(async () => {
     const r = await api("/jobs");
     if (r.ok) setJobs(r.data.data || []);
-    setLoadingJobs(false);
   }, []);
+
+  const fetchJobs = useCallback(async () => {
+    setLoadingJobs(true);
+    await refetchJobs();
+    setLoadingJobs(false);
+  }, [refetchJobs]);
 
   useEffect(() => {
     if (page === "home" || page === "jobs") fetchJobs();
   }, [page]);
 
-  const openJob = (job) => { setSelectedJob(job); setPage("job-detail"); };
+  // Poll (without flashing the loading spinner) while any job is still
+  // processing, so cards/badges update on their own instead of requiring a
+  // manual refresh click.
+  useEffect(() => {
+    if (page !== "home" && page !== "jobs") return;
+
+    const ACTIVE_STATUSES = ["queued", "downloading", "transcribing", "rendering", "processing"];
+    const hasActiveJob = jobs.some((j) => ACTIVE_STATUSES.includes(j.status));
+    if (!hasActiveJob) return;
+
+    const interval = setInterval(refetchJobs, 5000);
+    return () => clearInterval(interval);
+  }, [page, jobs, refetchJobs]);
+
+  const openJob = async (job) => {
+    setSelectedJob(job);
+    setPage("job-detail");
+    // Refresh in the background so the detail page (and the card once we're
+    // back) reflect the latest status/clips instead of a stale list snapshot.
+    const r = await api(`/jobs/${job.id}`);
+    if (r.ok) setSelectedJob(r.data.data);
+  };
 
   return (
     <div className="main-layout">
