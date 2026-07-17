@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconMenu, IconX } from "@/components/icons";
+import BrandLottie from "@/components/BrandLottie";
 import { slideDown, tween } from "@/lib/motion";
 
 const NAV_LINKS = [
-  { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
@@ -23,7 +23,7 @@ export default function Navbar({ onGetStarted, onLogin }) {
     >
       <div className="landing-container landing-nav-inner">
         <a href="#" className="landing-nav-brand">
-          <img src="/logo.svg" alt="ClipMantra" className="landing-nav-logo" />
+          <BrandLottie className="landing-nav-logo" size={44} />
           <span className="landing-nav-name">ClipMantra</span>
         </a>
 

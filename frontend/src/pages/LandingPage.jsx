@@ -1,11 +1,9 @@
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
-import StatsBar from "@/components/landing/StatsBar";
-import Features from "@/components/landing/Features";
 import HowItWorks from "@/components/landing/HowItWorks";
+import PipelineFlow from "@/components/landing/PipelineFlow";
 import Pricing from "@/components/landing/Pricing";
 import FAQ from "@/components/landing/FAQ";
-import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 
 export default function LandingPage({ onGetStarted, onLogin }) {
@@ -14,12 +12,10 @@ export default function LandingPage({ onGetStarted, onLogin }) {
       <Navbar onGetStarted={onGetStarted} onLogin={onLogin} />
       <main>
         <Hero onGetStarted={onGetStarted} />
-        <StatsBar />
-        <Features />
         <HowItWorks />
+        <PipelineFlow />
         <Pricing onGetStarted={onGetStarted} />
         <FAQ />
-        <CTA onGetStarted={onGetStarted} />
       </main>
       <Footer />
     </div>

@@ -217,12 +217,24 @@
   display: block;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/*
+ * NOTE: this reset must live inside `@layer base` (not as an unlayered
+ * rule). CSS cascade layers give ANY layered rule lower priority than
+ * unlayered rules, regardless of specificity — so an unlayered
+ * `margin: 0; padding: 0;` here would silently beat every Tailwind
+ * spacing utility (mt-*, mb-*, p-*, px-*, gap via padding, etc.) used
+ * across the app, since those utilities live in Tailwind's
+ * `@layer utilities`. That was previously breaking the landing page
+ * layout: mb-*, mt-*, p-* classes rendered as 0.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 body {

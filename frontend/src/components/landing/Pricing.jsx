@@ -1,12 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { IconCheck } from "@/components/icons";
 
 const PLANS = [
@@ -14,12 +5,14 @@ const PLANS = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Perfect for trying out ClipMantra",
+    description: "Full access to the ClipMantra pipeline today",
     features: [
-      "3 jobs per month",
-      "Up to 3 clips per job",
+      "Up to 10 jobs per hour",
+      "Up to 10 clips per job",
       "Viral score & AI hooks",
       "MP4 downloads",
+      "Live job progress",
+      "Email & Google sign-in",
       "24-hour file retention",
     ],
     cta: "Get Started",
@@ -29,93 +22,90 @@ const PLANS = [
     name: "Pro",
     price: "$29",
     period: "/month",
-    description: "For creators who publish consistently",
+    description: "Coming soon — for creators who need more volume",
     features: [
-      "Unlimited jobs",
-      "Up to 10 clips per job",
+      "Everything in Free",
+      "Higher job limits",
+      "Longer file retention",
       "Priority processing queue",
-      "Extended 7-day retention",
+      "More clips per job",
+      "Early access to new features",
       "Email support",
-      "Google OAuth sign-in",
     ],
-    cta: "Start Pro Trial",
+    cta: "Get Started",
     popular: true,
   },
   {
     name: "Team",
     price: "$99",
     period: "/month",
-    description: "For agencies and content teams",
+    description: "Coming soon — for agencies and content teams",
     features: [
-      "Everything in Pro",
-      "5 team members",
-      "Shared job dashboard",
-      "API access (coming soon)",
+      "Everything planned for Pro",
+      "Up to 5 team seats",
+      "Shared job workspace",
+      "API access",
+      "Role-based permissions",
+      "Centralized team billing",
       "Priority support",
-      "Custom retention policies",
     ],
-    cta: "Contact Sales",
+    cta: "Get Started",
     popular: false,
   },
 ];
 
 export default function Pricing({ onGetStarted }) {
   return (
-    <section id="pricing" className="landing-section-lg">
+    <section id="pricing" className="landing-pricing">
       <div className="landing-container">
-        <div className="mx-auto mb-16 max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-            Pricing
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            Simple, transparent pricing
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Start free, upgrade when you&apos;re ready. No hidden fees.
+        <div className="landing-pricing-head">
+          <p className="landing-pricing-eyebrow">Pricing</p>
+          <h2 className="landing-pricing-title">Simple, transparent pricing</h2>
+          <p className="landing-pricing-sub">
+            Start free today. Paid plans are on the way — no hidden fees.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 items-stretch">
+        <div className="landing-pricing-grid">
           {PLANS.map((plan) => (
-            <Card
+            <article
               key={plan.name}
-              className={`relative flex flex-col h-full border-border/60 bg-card/50 ${
-                plan.popular ? "border-primary/50 ring-1 ring-primary/25 lg:mt-0" : ""
-              }`}
+              className={`landing-pricing-card${plan.popular ? " landing-pricing-card--popular" : ""}`}
             >
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap bg-primary text-primary-foreground">
-                  Most Popular
-                </Badge>
+                <span className="landing-pricing-badge">Most Popular</span>
               )}
-              <CardHeader className={plan.popular ? "pt-8" : ""}>
-                <CardTitle className="text-lg font-bold">{plan.name}</CardTitle>
-                <CardDescription className="min-h-10">{plan.description}</CardDescription>
-                <div className="mt-4">
-                  <span className="font-display text-4xl font-extrabold">
-                    {plan.price}
-                  </span>
-                  <span className="text-muted-foreground">{plan.period}</span>
+
+              <div className="landing-pricing-card-top">
+                <h3 className="landing-pricing-name">{plan.name}</h3>
+                <p className="landing-pricing-desc">{plan.description}</p>
+                <div className="landing-pricing-price">
+                  <span className="landing-pricing-amount">{plan.price}</span>
+                  <span className="landing-pricing-period">{plan.period}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="flex flex-1 flex-col justify-between">
-                <ul className="mb-8 flex flex-col gap-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm">
-                      <IconCheck className="mt-0.5 text-primary shrink-0" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  variant={plan.popular ? "default" : "outline"}
-                  className="w-full shadow-none mt-auto"
+              </div>
+
+              <ul className="landing-pricing-features">
+                {plan.features.map((feature) => (
+                  <li key={feature}>
+                    <span className="landing-pricing-check" aria-hidden="true">
+                      <IconCheck />
+                    </span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="landing-pricing-cta-wrap">
+                <button
+                  type="button"
+                  className={`landing-pricing-cta${plan.popular ? " landing-pricing-cta--primary" : ""}`}
                   onClick={onGetStarted}
                 >
                   {plan.cta}
-                </Button>
-              </CardContent>
-            </Card>
+                </button>
+              </div>
+            </article>
           ))}
         </div>
       </div>

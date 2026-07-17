@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: "How does the AI choose viral moments?",
-    a: "Our automated pipeline transcribes the audio, then our proprietary AI analysis engine evaluates the transcript for hooks, emotional peaks, surprising statements, and viral patterns. Each clip gets a viral score with reasoning.",
+    a: "Our automated pipeline transcribes the audio, then our AI analysis engine evaluates the transcript for hooks, emotional peaks, surprising statements, and viral patterns. Each clip gets a viral score with reasoning.",
   },
   {
     q: "What format are the clips exported in?",
@@ -20,43 +20,60 @@ const FAQS = [
   },
   {
     q: "How long does processing take?",
-    a: "Most jobs complete in a few minutes depending on video length. You can track real-time progress on your dashboard via live updates as the pipeline moves through download, transcription, and rendering.",
+    a: "Most jobs complete in a few minutes depending on video length. You can track real-time progress on your dashboard as the pipeline moves through download, transcription, and rendering.",
   },
   {
     q: "How long are my files stored?",
-    a: "Files are automatically cleaned up 24 hours after job completion to keep your data secure. Pro and Team plans offer extended retention.",
+    a: "Files are automatically cleaned up 24 hours after job completion to keep your data secure.",
   },
   {
     q: "Can I use Google sign-in?",
-    a: "Yes! ClipMantra supports both email/password authentication and Google OAuth for quick, secure sign-in.",
+    a: "Yes. ClipMantra supports both email/password authentication and Google OAuth for quick, secure sign-in.",
   },
 ];
 
 export default function FAQ() {
   return (
-    <section id="faq" className="landing-section border-t border-border/60 bg-secondary/20">
-      <div className="landing-container mx-auto max-w-3xl">
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-            FAQ
+    <section id="faq" className="landing-faq">
+      <div className="landing-container">
+        <div className="landing-faq-head">
+          <p className="landing-faq-eyebrow">FAQ</p>
+          <h2 className="landing-faq-title">Frequently asked questions</h2>
+          <p className="landing-faq-sub">
+            Everything you need to know about ClipMantra — can&apos;t find an answer? Reach out anytime.
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            Frequently asked questions
-          </h2>
         </div>
 
-        <Accordion type="single" collapsible className="mt-12">
-          {FAQS.map((faq, i) => (
-            <AccordionItem key={faq.q} value={`item-${i}`}>
-              <AccordionTrigger className="text-left text-base">
-                {faq.q}
-              </AccordionTrigger>
-              <AccordionContent className="leading-relaxed">
-                {faq.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <div className="landing-faq-panel">
+          <Accordion type="single" collapsible className="landing-faq-accordion">
+            {FAQS.map((faq, i) => (
+              <AccordionItem
+                key={faq.q}
+                value={`item-${i}`}
+                className="landing-faq-item"
+              >
+                <AccordionTrigger className="landing-faq-trigger">
+                  <span className="landing-faq-q">{faq.q}</span>
+                </AccordionTrigger>
+                <AccordionContent className="landing-faq-answer">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        <div className="landing-faq-cta">
+          <div>
+            <p className="landing-faq-cta-title">Still have questions?</p>
+            <p className="landing-faq-cta-sub">
+              We typically reply within a few hours on weekdays.
+            </p>
+          </div>
+          <a href="#" className="landing-faq-cta-btn">
+            Contact support
+          </a>
+        </div>
       </div>
     </section>
   );
