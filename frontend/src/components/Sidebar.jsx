@@ -15,7 +15,6 @@ const NAV = [
   {
     section: "Manage", items: [
       { id: "home", icon: "⬡", label: "Dashboard" },
-      { id: "jobs", icon: "≡", label: "All Jobs" },
     ]
   },
   {
@@ -30,7 +29,7 @@ const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleNav = (id) => {
-    if (id === "site-home") {
+    if (id === "site-home" || id === "mobile-home") {
       onGoHome?.();
       setIsOpen(false);
       return;
@@ -41,9 +40,9 @@ const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
 
   // Flattened items for mobile bottom nav
   const mobileItems = [
-    { id: "home", icon: "⬡", label: "Home" },
+    { id: "mobile-home", icon: "⌂", label: "Home" },
     { id: "new-job", icon: "＋", label: "Create" },
-    { id: "jobs", icon: "≡", label: "Jobs" },
+    { id: "home", icon: "≡", label: "Jobs" },
     { id: "settings", icon: "◎", label: "Profile" },
   ];
 
@@ -62,23 +61,47 @@ const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
         zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span className="logo-text" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--fs-xl)", fontWeight: 800, letterSpacing: "-0.03em" }}>
+          <button
+            type="button"
+            className="logo-text"
+            onClick={() => onGoHome?.()}
+            aria-label="Go to ClipMantra home"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: "var(--fs-xl)",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              background: "none",
+              border: "none",
+              color: "inherit",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
             <BrandLottie className="landing-nav-logo" size={26} />
             ClipMantra
-          </span>
+          </button>
           <span style={{
             fontSize: "var(--fs-xs)", background: '#1a1a2e', padding: '2px 8px',
             borderRadius: 4, color: 'var(--text-muted)', border: '1px solid var(--border-color)'
           }}>Free</span>
         </div>
-        <div style={{
-          width: 32, height: 32, borderRadius: '50%',
-          background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'var(--primary)', fontSize: 12, fontWeight: 700
-        }}>
+        <button
+          type="button"
+          onClick={() => setPage("home")}
+          aria-label="Open dashboard"
+          style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--primary)', fontSize: 12, fontWeight: 700,
+            cursor: 'pointer', padding: 0,
+          }}
+        >
           {user?.name?.charAt(0).toUpperCase()}
-        </div>
+        </button>
       </div>
 
       {/* Mobile Bottom Navigation */}
@@ -97,26 +120,45 @@ const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
         justifyContent: "space-around",
         alignItems: "center"
       }}>
-        {mobileItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setPage(item.id)}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 4,
-              background: "none",
-              border: "none",
-              color: page === item.id ? "var(--primary)" : "var(--text-muted)",
-              cursor: "pointer",
-              transition: "all 0.2s"
-            }}
-          >
-            <span style={{ fontSize: 24 }}>{item.icon}</span>
-            <span style={{ fontSize: "var(--fs-xs)", fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</span>
-          </button>
-        ))}
+        {mobileItems.map((item) => {
+          const isActive =
+            item.id === "mobile-home"
+              ? false
+              : item.id === "home"
+                ? page === "home"
+                : page === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                if (item.id === "home") {
+                  setPage("home");
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    document.getElementById("jobs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 80);
+                  return;
+                }
+                handleNav(item.id);
+              }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                background: "none",
+                border: "none",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                cursor: "pointer",
+                transition: "all 0.2s"
+              }}
+            >
+              <span style={{ fontSize: 24 }}>{item.icon}</span>
+              <span style={{ fontSize: "var(--fs-xs)", fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       <style>{`
@@ -141,16 +183,55 @@ const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
         <div style={{
           padding: "0 22px 24px",
           display: 'flex',
+          flexDirection: isCollapsed ? 'column' : 'row',
           justifyContent: isCollapsed ? 'center' : 'space-between',
           alignItems: 'center',
+          gap: isCollapsed ? 10 : 0,
           borderBottom: "1px solid var(--border-muted)",
           marginBottom: 8
         }}>
           {!isCollapsed && (
-            <span className="logo-text" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--fs-xl)", fontWeight: 800, whiteSpace: "nowrap", letterSpacing: "-0.03em" }}>
+            <button
+              type="button"
+              className="logo-text"
+              onClick={() => onGoHome?.()}
+              aria-label="Go to ClipMantra home"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: "var(--fs-xl)",
+                fontWeight: 800,
+                whiteSpace: "nowrap",
+                letterSpacing: "-0.03em",
+                background: "none",
+                border: "none",
+                color: "inherit",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
               <BrandLottie className="landing-nav-logo" size={28} />
               ClipMantra
-            </span>
+            </button>
+          )}
+          {isCollapsed && (
+            <button
+              type="button"
+              onClick={() => onGoHome?.()}
+              aria-label="Go to ClipMantra home"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <BrandLottie className="landing-nav-logo" size={28} />
+            </button>
           )}
           <button
             className="collapse-btn"

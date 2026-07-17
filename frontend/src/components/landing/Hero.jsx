@@ -48,15 +48,19 @@ export default function Hero({ onGetStarted }) {
             variants={stagger(0.1)}
           >
             {/* Brand badge */}
-            <motion.div 
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary mb-8"
+            <motion.div
+              className="landing-hero-badge"
               variants={fadeUp}
               transition={tween(0.5)}
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z" />
               </svg>
-              India’s Emerging AI-Powered Video Clipping Platform
+              <span>
+                India’s Emerging AI-Powered
+                <br className="landing-hero-badge-br" />
+                {" "}Video Clipping Platform
+              </span>
             </motion.div>
 
             <motion.h1 className="landing-hero-title font-extrabold tracking-tight mb-6" variants={fadeUp} transition={tween(0.55)}>
@@ -133,7 +137,9 @@ export default function Hero({ onGetStarted }) {
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.71 3.5L1.15 15l3.28 5.7h13.12l3.28-5.7L14.29 3.5H7.71zm.88.9h6.82l5.72 10-3.41 5.9H6.29l-3.4-5.9 5.7-10z"/></svg>
               </div>
               <div className="landing-hero-social landing-hero-social--dropbox">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 11.233l-5.753-3.69-6.247 3.99 6.247 4.004L24 11.233zM5.753 7.543L0 11.233l5.753 4.308 6.247-4.004-6.247-3.994zM12 11.533v.01l6.247 4.004-6.247 3.99v-8.004zm0 8.01v.01c0 .484.262.92.684 1.155l5.563 3.1c.421.236.937.236 1.359 0l5.562-3.1c.422-.236.684-.67.684-1.156v-.01l-6.926-4.426L12 19.543zm-6.247-4.004L0 11.233l5.753-3.69 6.247 3.994-6.247 4.004z"/></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 2.5 0 6.25 6 10l6-3.75L6 2.5Zm12 0-6 3.75L18 10l6-3.75L18 2.5ZM0 13.75l6 3.75 6-3.75L6 10 0 13.75Zm18 0-6 3.75 6 3.75 6-3.75-6-3.75ZM6 18.5l6 3.75 6-3.75L12 14.75 6 18.5Z" />
+                </svg>
               </div>
             </div>
           </motion.div>

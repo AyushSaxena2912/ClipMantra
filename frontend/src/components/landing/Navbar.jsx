@@ -40,7 +40,14 @@ export default function Navbar({
       transition={tween(0.45)}
     >
       <div className="landing-container landing-nav-inner">
-        <a href="#" className="landing-nav-brand">
+        <a
+          href="#"
+          className="landing-nav-brand"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
           <BrandLottie className="landing-nav-logo" size={44} />
           <span className="landing-nav-name">ClipMantra</span>
         </a>

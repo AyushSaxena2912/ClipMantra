@@ -103,7 +103,14 @@ export default function Footer() {
       <div className="landing-container">
         <div className="landing-footer-top">
           <div className="landing-footer-brand">
-            <a href="#" className="landing-footer-logo">
+            <a
+              href="#"
+              className="landing-footer-logo"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
               <BrandLottie className="landing-footer-logo-img" size={44} />
               <span>ClipMantra</span>
             </a>

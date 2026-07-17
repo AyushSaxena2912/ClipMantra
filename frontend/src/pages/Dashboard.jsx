@@ -3,7 +3,6 @@ import { api } from "../api";
 import Sidebar from "../components/Sidebar";
 import HomePage from "./HomePage";
 import NewJobPage from "./NewJobPage";
-import JobsPage from "./JobsPage";
 import JobDetailPage from "./JobDetailPage";
 import SettingsPage from "./SettingsPage";
 
@@ -25,14 +24,14 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
   }, [refetchJobs]);
 
   useEffect(() => {
-    if (page === "home" || page === "jobs") fetchJobs();
+    if (page === "home") fetchJobs();
   }, [page]);
 
   // Poll (without flashing the loading spinner) while any job is still
   // processing, so cards/badges update on their own instead of requiring a
   // manual refresh click.
   useEffect(() => {
-    if (page !== "home" && page !== "jobs") return;
+    if (page !== "home") return;
 
     const ACTIVE_STATUSES = ["queued", "downloading", "transcribing", "rendering", "processing"];
     const hasActiveJob = jobs.some((j) => ACTIVE_STATUSES.includes(j.status));
@@ -65,7 +64,6 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
               setPage("new-job");
             }}
             onViewJob={openJob}
-            onViewAll={() => setPage("jobs")}
           />
         )}
         {page === "new-job" && (
@@ -74,16 +72,14 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
             toast={toast}
           />
         )}
-        {page === "jobs" && (
-          <JobsPage
-            jobs={jobs}
-            loading={loadingJobs}
-            onViewJob={openJob}
+        {page === "job-detail" && selectedJob && (
+          <JobDetailPage
+            job={selectedJob}
+            onBack={() => setPage("home")}
+            toast={toast}
             onRefresh={fetchJobs}
-            onNewJob={() => setPage("new-job")}
           />
         )}
-        {page === "job-detail" && selectedJob && <JobDetailPage job={selectedJob} onBack={() => setPage("jobs")} toast={toast} onRefresh={fetchJobs} />}
         {page === "settings" && <SettingsPage user={user} toast={toast} onLogout={onLogout} />}
       </div>
     </div>

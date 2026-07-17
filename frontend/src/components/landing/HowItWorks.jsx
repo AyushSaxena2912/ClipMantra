@@ -188,10 +188,10 @@ function ViralityMock() {
 function SocialIcon({ type }) {
   if (type === "instagram") {
     return (
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 7.2A4.8 4.8 0 1 0 12 16.8 4.8 4.8 0 0 0 12 7.2zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2z" />
-        <circle cx="17.5" cy="6.5" r="1.1" />
-        <path d="M16.5 2h-9A5.5 5.5 0 0 0 2 7.5v9A5.5 5.5 0 0 0 7.5 22h9a5.5 5.5 0 0 0 5.5-5.5v-9A5.5 5.5 0 0 0 16.5 2zm3.8 14.5a3.8 3.8 0 0 1-3.8 3.8h-9a3.8 3.8 0 0 1-3.8-3.8v-9a3.8 3.8 0 0 1 3.8-3.8h9a3.8 3.8 0 0 1 3.8 3.8v9z" />
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 8.75A3.25 3.25 0 1 0 12 15.25 3.25 3.25 0 0 0 12 8.75zm0 5.25a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
+        <circle cx="16.7" cy="7.35" r="0.95" />
+        <path d="M17.2 3.5H6.8A3.3 3.3 0 0 0 3.5 6.8v10.4a3.3 3.3 0 0 0 3.3 3.3h10.4a3.3 3.3 0 0 0 3.3-3.3V6.8a3.3 3.3 0 0 0-3.3-3.3zm2.05 13.7a2.05 2.05 0 0 1-2.05 2.05H6.8a2.05 2.05 0 0 1-2.05-2.05V6.8A2.05 2.05 0 0 1 6.8 4.75h10.4A2.05 2.05 0 0 1 19.25 6.8v10.4z" />
       </svg>
     );
   }
@@ -219,17 +219,11 @@ function SocialIcon({ type }) {
   if (type === "facebook") {
     return (
       <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z" />
+        <path d="M14 8.2h2.6V5h-2.6C11.7 5 10 6.7 10 9.3V11H7.5v3.2H10V21h3.3v-6.8h2.5l.5-3.2h-3V9.5c0-.7.3-1.3 1.2-1.3z" />
       </svg>
     );
   }
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M6.5 9.5A2.5 2.5 0 0 1 9 7h6a2.5 2.5 0 0 1 0 5H9a2.5 2.5 0 0 0 0 5h6a2.5 2.5 0 0 0 2.5-2.5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <circle cx="6.5" cy="9.5" r="2" />
-      <circle cx="17.5" cy="14.5" r="2" />
-    </svg>
-  );
+  return null;
 }
 
 function ViralClipsMock() {
@@ -261,9 +255,6 @@ function ViralClipsMock() {
       </span>
       <span className="landing-how-collage-social landing-how-collage-social--fb">
         <SocialIcon type="facebook" />
-      </span>
-      <span className="landing-how-collage-social landing-how-collage-social--li">
-        <SocialIcon type="linkedin" />
       </span>
       <span className="landing-how-collage-social landing-how-collage-social--x">
         <SocialIcon type="x" />

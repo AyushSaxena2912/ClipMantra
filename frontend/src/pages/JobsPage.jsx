@@ -13,7 +13,7 @@ const JobsPage = ({ jobs, loading, onViewJob, onRefresh, onNewJob }) => {
       <header className="jobs-header">
         <div>
           <p className="jobs-eyebrow">Manage</p>
-          <h1 className="jobs-title">All jobs</h1>
+          <h1 className="jobs-title">Jobs</h1>
           <p className="jobs-sub">
             {jobs.length === 0
               ? "Your clip jobs will show up here"

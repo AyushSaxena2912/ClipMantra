@@ -227,10 +227,21 @@ const AuthPage = ({ onLogin, toast, onBack }) => {
       <main className="landing-auth-panel">
         <div className="landing-auth-form">
           <div className="landing-auth-brand">
-            <div className="landing-auth-logo">
+            <button
+              type="button"
+              className="landing-auth-logo"
+              onClick={onBack}
+              aria-label="Go to ClipMantra home"
+              style={{
+                background: "none",
+                border: "none",
+                cursor: onBack ? "pointer" : "default",
+                padding: 0,
+              }}
+            >
               <BrandLottie className="landing-auth-brand-lottie" size={36} />
               <span className="landing-auth-logo-name">ClipMantra</span>
-            </div>
+            </button>
           </div>
 
           <div className="landing-auth-heading">
