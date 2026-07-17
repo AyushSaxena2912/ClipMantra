@@ -53,13 +53,14 @@ export default function Hero({ onGetStarted }) {
               variants={fadeUp}
               transition={tween(0.5)}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z" />
-              </svg>
-              <span>
-                India’s Emerging AI-Powered
-                <br className="landing-hero-badge-br" />
-                {" "}Video Clipping Platform
+              <span className="landing-hero-badge-text">
+                <span className="landing-hero-badge-line1">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z" />
+                  </svg>
+                  India’s Emerging AI-Powered
+                </span>
+                <span className="landing-hero-badge-line2">Video Clipping Platform</span>
               </span>
             </motion.div>
 

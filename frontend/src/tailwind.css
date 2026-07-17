@@ -790,7 +790,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
   box-sizing: border-box;
   max-width: min(100%, 22rem);
   margin: 0 auto 1.75rem;
@@ -807,55 +806,74 @@
   text-align: center;
 }
 
-.landing-hero-badge svg {
+.landing-hero-badge-text {
+  display: inline;
+}
+
+.landing-hero-badge-line1 {
+  display: inline;
+}
+
+.landing-hero-badge-line1 svg {
+  display: inline-block;
   width: 0.85rem;
   height: 0.85rem;
-  flex-shrink: 0;
+  margin-right: 0.4rem;
+  vertical-align: -0.12em;
 }
 
-.landing-hero-badge span {
-  min-width: 0;
-  text-align: center;
-  text-wrap: balance;
-  line-height: 1.45;
+.landing-hero-badge-line2 {
+  display: inline;
 }
 
-.landing-hero-badge-br {
-  display: none;
+.landing-hero-badge-line2::before {
+  content: " ";
 }
 
 /* Mobile + narrow tablets */
 @media (max-width: 639px) {
   .landing-hero-badge {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
     width: auto;
     max-width: calc(100% - 2rem);
     margin-left: auto;
     margin-right: auto;
-    padding: 0.7rem 1rem;
+    padding: 0.7rem 1.1rem;
     border-radius: 1rem;
     font-size: 0.6875rem;
     letter-spacing: 0;
+    white-space: normal;
+  }
+
+  .landing-hero-badge-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    width: 100%;
+  }
+
+  .landing-hero-badge-line1 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 0.4rem;
-    white-space: normal;
+    white-space: nowrap;
   }
 
-  .landing-hero-badge svg {
-    margin-top: 0.12em;
+  .landing-hero-badge-line1 svg {
+    margin-right: 0;
+    flex-shrink: 0;
   }
 
-  .landing-hero-badge span {
+  .landing-hero-badge-line2 {
     display: block;
-    width: auto;
-    white-space: normal;
-    text-align: left;
-    line-height: 1.5;
+    width: 100%;
+    text-align: center;
+    line-height: 1.45;
   }
 
-  .landing-hero-badge-br {
-    display: block;
+  .landing-hero-badge-line2::before {
+    content: none;
   }
 }
 
@@ -863,22 +881,21 @@
   .landing-hero-badge {
     max-width: none;
     width: auto;
-    flex-direction: row;
     padding: 0.4rem 1rem;
     font-size: 0.75rem;
     white-space: nowrap;
     border-radius: 9999px;
   }
 
-  .landing-hero-badge span {
-    flex: 0 1 auto;
-    width: auto;
-    text-align: left;
+  .landing-hero-badge-text {
+    display: inline;
     white-space: nowrap;
   }
 
-  .landing-hero-badge-br {
-    display: none;
+  .landing-hero-badge-line1,
+  .landing-hero-badge-line2 {
+    display: inline;
+    white-space: nowrap;
   }
 }
 
