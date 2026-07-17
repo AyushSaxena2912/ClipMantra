@@ -1,11 +1,11 @@
 const STATUS = {
-  queued: { label: "QUEUED", color: "#888", bg: "#1a1a1a", dot: "#888" },
-  downloading: { label: "DOWNLOADING", color: "#f0a500", bg: "#1a1400", dot: "#f0a500" },
-  transcribing: { label: "TRANSCRIBING", color: "#00aaff", bg: "#001428", dot: "#00aaff" },
-  rendering: { label: "RENDERING", color: "#a855f7", bg: "#120028", dot: "#a855f7" },
-  processing: { label: "PROCESSING", color: "#a855f7", bg: "#120028", dot: "#a855f7" },
-  completed: { label: "COMPLETED", color: "#00e599", bg: "#001a0f", dot: "#00e599" },
-  failed: { label: "FAILED", color: "#ff3b3b", bg: "#1a0000", dot: "#ff3b3b" },
+  queued: { label: "QUEUED", color: "#a1a1aa", bg: "#121216", dot: "#a1a1aa" },
+  downloading: { label: "DOWNLOADING", color: "#f59e0b", bg: "#1a1408", dot: "#f59e0b" },
+  transcribing: { label: "TRANSCRIBING", color: "#38bdf8", bg: "#061018", dot: "#38bdf8" },
+  rendering: { label: "RENDERING", color: "#c084fc", bg: "#14081f", dot: "#c084fc" },
+  processing: { label: "PROCESSING", color: "#c084fc", bg: "#14081f", dot: "#c084fc" },
+  completed: { label: "COMPLETED", color: "#34d399", bg: "#06140f", dot: "#34d399" },
+  failed: { label: "FAILED", color: "#ef4444", bg: "#1a0808", dot: "#ef4444" },
 };
 
 const ACTIVE = ["downloading", "transcribing", "rendering", "processing"];

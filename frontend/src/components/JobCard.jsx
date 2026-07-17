@@ -86,9 +86,9 @@ const JobCard = ({ job, onClick }) => {
 
                     {job.status === "completed" && clips.length > 0 ? (
                         <span style={{
-                            color: "var(--primary)", fontSize: 9,
-                            fontWeight: 800, background: 'rgba(0, 229, 153, 0.1)',
-                            padding: '1px 6px', borderRadius: 4, border: '1px solid rgba(0, 229, 153, 0.2)'
+                            color: "var(--primary-hover)", fontSize: 9,
+                            fontWeight: 800, background: 'var(--primary-soft)',
+                            padding: '1px 6px', borderRadius: 4, border: '1px solid var(--primary-border)'
                         }}>
                             {clips.length} READY
                         </span>

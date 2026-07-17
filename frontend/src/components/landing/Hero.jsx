@@ -47,16 +47,16 @@ export default function Hero({ onGetStarted }) {
             animate="visible"
             variants={stagger(0.1)}
           >
-            {/* Credit Badge */}
+            {/* Brand badge */}
             <motion.div 
               className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary mb-8"
               variants={fadeUp}
               transition={tween(0.5)}
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z" />
               </svg>
-              Start free — no credit card
+              India’s Emerging AI-Powered Video Clipping Platform
             </motion.div>
 
             <motion.h1 className="landing-hero-title font-extrabold tracking-tight mb-6" variants={fadeUp} transition={tween(0.55)}>

@@ -27,20 +27,29 @@ export default function App() {
   const handleLogout = () => {
     removeToken(); removeUser(); setUser(null); setPage("landing"); toast("Signed out.", "info");
   };
+  const goLanding = () => setPage("landing");
+  const goDashboard = () => setPage("dashboard");
+  const goAuth = () => setPage("auth");
 
   return (
     <>
       <Toasts toasts={toasts} />
       {page === "landing" && (
         <Suspense fallback={<PageLoader />}>
-          <LandingPage onGetStarted={() => setPage("auth")} onLogin={() => setPage("auth")} />
+          <LandingPage
+            isLoggedIn={!!user}
+            user={user}
+            onGetStarted={user ? goDashboard : goAuth}
+            onLogin={user ? goDashboard : goAuth}
+            onLogout={handleLogout}
+          />
         </Suspense>
       )}
       {page === "auth" && (
-        <AuthPage onLogin={handleLogin} toast={toast} onBack={() => setPage("landing")} />
+        <AuthPage onLogin={handleLogin} toast={toast} onBack={goLanding} />
       )}
       {page === "dashboard" && (
-        <Dashboard user={user} onLogout={handleLogout} toast={toast} />
+        <Dashboard user={user} onLogout={handleLogout} toast={toast} onGoHome={goLanding} />
       )}
     </>
   );

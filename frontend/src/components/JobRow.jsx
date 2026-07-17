@@ -17,7 +17,7 @@ const JobRow = ({ job, onClick }) => {
         cursor: "pointer", transition: "all 0.15s",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "rgba(0, 229, 153, 0.2)";
+        e.currentTarget.style.borderColor = "var(--primary-border)";
         e.currentTarget.style.background = "rgba(22, 22, 26, 0.8)";
       }}
       onMouseLeave={(e) => {

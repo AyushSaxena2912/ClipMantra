@@ -7,7 +7,7 @@ import JobsPage from "./JobsPage";
 import JobDetailPage from "./JobDetailPage";
 import SettingsPage from "./SettingsPage";
 
-const Dashboard = ({ user, onLogout, toast }) => {
+const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
   const [page, setPage] = useState("home");
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -52,12 +52,37 @@ const Dashboard = ({ user, onLogout, toast }) => {
   };
 
   return (
-    <div className="main-layout">
-      <Sidebar page={page} setPage={setPage} user={user} onLogout={onLogout} />
+    <div className="app-shell main-layout">
+      <Sidebar page={page} setPage={setPage} user={user} onLogout={onLogout} onGoHome={onGoHome} />
       <div className="content-area">
-        {page === "home" && <HomePage jobs={jobs} loading={loadingJobs} onNewJob={() => setPage("new-job")} onViewJob={openJob} onViewAll={() => setPage("jobs")} />}
-        {page === "new-job" && <NewJobPage onJobCreated={(j) => { fetchJobs(); setSelectedJob(j); setPage("job-detail"); }} toast={toast} />}
-        {page === "jobs" && <JobsPage jobs={jobs} loading={loadingJobs} onViewJob={openJob} onRefresh={fetchJobs} />}
+        {page === "home" && (
+          <HomePage
+            user={user}
+            jobs={jobs}
+            loading={loadingJobs}
+            onNewJob={(initialUrl) => {
+              if (initialUrl) sessionStorage.setItem("clipmantra_draft_url", initialUrl);
+              setPage("new-job");
+            }}
+            onViewJob={openJob}
+            onViewAll={() => setPage("jobs")}
+          />
+        )}
+        {page === "new-job" && (
+          <NewJobPage
+            onJobCreated={(j) => { fetchJobs(); setSelectedJob(j); setPage("job-detail"); }}
+            toast={toast}
+          />
+        )}
+        {page === "jobs" && (
+          <JobsPage
+            jobs={jobs}
+            loading={loadingJobs}
+            onViewJob={openJob}
+            onRefresh={fetchJobs}
+            onNewJob={() => setPage("new-job")}
+          />
+        )}
         {page === "job-detail" && selectedJob && <JobDetailPage job={selectedJob} onBack={() => setPage("jobs")} toast={toast} onRefresh={fetchJobs} />}
         {page === "settings" && <SettingsPage user={user} toast={toast} onLogout={onLogout} />}
       </div>

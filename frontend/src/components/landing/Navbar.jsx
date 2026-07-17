@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconMenu, IconX } from "@/components/icons";
 import BrandLottie from "@/components/BrandLottie";
@@ -10,8 +10,26 @@ const NAV_LINKS = [
   { label: "FAQ", href: "#faq" },
 ];
 
-export default function Navbar({ onGetStarted, onLogin }) {
+export default function Navbar({
+  onGetStarted,
+  onLogin,
+  onLogout,
+  isLoggedIn = false,
+  user = null,
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const initial = user?.name?.[0]?.toUpperCase() || "U";
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDocClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [menuOpen]);
 
   return (
     <motion.header
@@ -36,12 +54,69 @@ export default function Navbar({ onGetStarted, onLogin }) {
         </nav>
 
         <div className="landing-nav-actions">
-          <button type="button" className="landing-nav-signin" onClick={onLogin}>
-            Sign in
-          </button>
-          <button type="button" className="landing-nav-cta" onClick={onGetStarted}>
-            Get Started Free
-          </button>
+          {isLoggedIn ? (
+            <>
+              <button type="button" className="landing-nav-cta" onClick={onLogin}>
+                Dashboard
+              </button>
+              <div className="landing-nav-profile" ref={menuRef}>
+                <button
+                  type="button"
+                  className="landing-nav-avatar"
+                  aria-label="Account menu"
+                  aria-expanded={menuOpen}
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  {initial}
+                </button>
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      className="landing-nav-menu"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <div className="landing-nav-menu-user">
+                        <p className="landing-nav-menu-name">{user?.name}</p>
+                        <p className="landing-nav-menu-email">{user?.email}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className="landing-nav-menu-item"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onLogin?.();
+                        }}
+                      >
+                        Go to Dashboard
+                      </button>
+                      <button
+                        type="button"
+                        className="landing-nav-menu-item landing-nav-menu-item--danger"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onLogout?.();
+                        }}
+                      >
+                        Sign out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <>
+              <button type="button" className="landing-nav-signin" onClick={onLogin}>
+                Sign in
+              </button>
+              <button type="button" className="landing-nav-cta" onClick={onGetStarted}>
+                Get Started Free
+              </button>
+            </>
+          )}
         </div>
 
         <button
@@ -74,12 +149,46 @@ export default function Navbar({ onGetStarted, onLogin }) {
                 </a>
               ))}
               <div className="landing-nav-mobile-actions">
-                <button type="button" className="landing-nav-signin" onClick={onLogin}>
-                  Sign in
-                </button>
-                <button type="button" className="landing-nav-cta" onClick={onGetStarted}>
-                  Get Started Free
-                </button>
+                {isLoggedIn ? (
+                  <>
+                    <div className="landing-nav-mobile-user">
+                      <span className="landing-nav-avatar" aria-hidden="true">{initial}</span>
+                      <div>
+                        <p className="landing-nav-menu-name">{user?.name}</p>
+                        <p className="landing-nav-menu-email">{user?.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="landing-nav-cta"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        onLogin?.();
+                      }}
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      type="button"
+                      className="landing-nav-signin"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        onLogout?.();
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="landing-nav-signin" onClick={onLogin}>
+                      Sign in
+                    </button>
+                    <button type="button" className="landing-nav-cta" onClick={onGetStarted}>
+                      Get Started Free
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

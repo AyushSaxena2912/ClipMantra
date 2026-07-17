@@ -6,10 +6,22 @@ import Pricing from "@/components/landing/Pricing";
 import FAQ from "@/components/landing/FAQ";
 import Footer from "@/components/landing/Footer";
 
-export default function LandingPage({ onGetStarted, onLogin }) {
+export default function LandingPage({
+  onGetStarted,
+  onLogin,
+  onLogout,
+  isLoggedIn = false,
+  user = null,
+}) {
   return (
     <div className="landing-page">
-      <Navbar onGetStarted={onGetStarted} onLogin={onLogin} />
+      <Navbar
+        onGetStarted={onGetStarted}
+        onLogin={onLogin}
+        onLogout={onLogout}
+        isLoggedIn={isLoggedIn}
+        user={user}
+      />
       <main>
         <Hero onGetStarted={onGetStarted} />
         <HowItWorks />

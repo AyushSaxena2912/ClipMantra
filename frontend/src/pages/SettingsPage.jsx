@@ -1,84 +1,119 @@
 import { useState } from "react";
 import { api } from "../api";
-import Input from "../components/Input";
 
 const SettingsPage = ({ user, toast, onLogout }) => {
   const [f, setF] = useState({ old: "", newp: "", confirm: "" });
   const [loading, setLoading] = useState(false);
   const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
-  const changePassword = async () => {
-    if (!f.old || !f.newp || !f.confirm) { toast("All fields required", "error"); return; }
+  const changePassword = async (e) => {
+    e?.preventDefault?.();
+    if (!f.old || !f.newp || !f.confirm) {
+      toast("Please fill all password fields", "error");
+      return;
+    }
     setLoading(true);
     const r = await api("/auth/change-password", {
       method: "PATCH",
-      body: JSON.stringify({ oldPassword: f.old, newPassword: f.newp, confirmPassword: f.confirm }),
+      body: JSON.stringify({
+        oldPassword: f.old,
+        newPassword: f.newp,
+        confirmPassword: f.confirm,
+      }),
     });
     setLoading(false);
-    if (r.ok) { toast("Password changed!", "success"); setF({ old: "", newp: "", confirm: "" }); }
-    else toast(r.data.message, "error");
+    if (r.ok) {
+      toast("Password updated", "success");
+      setF({ old: "", newp: "", confirm: "" });
+    } else {
+      toast(r.data.message || "Couldn't update password", "error");
+    }
   };
 
+  const initial = user?.name?.[0]?.toUpperCase() || "?";
+
   return (
-    <div style={{ maxWidth: 520 }} className="flex flex-col gap-lg">
-      <div className="page-header">
-        <h1>Settings</h1>
-        <p>Manage your account</p>
-      </div>
+    <div className="settings">
+      <header className="settings-header">
+        <p className="settings-eyebrow">Account</p>
+        <h1 className="settings-title">Settings</h1>
+        <p className="settings-sub">Manage your profile and sign-in security</p>
+      </header>
 
-      {/* Profile Card */}
-      <div className="card" style={{ padding: "var(--spacing-md)" }}>
-        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--text-main)", margin: "0 0 20px" }}>Profile</h2>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <div className="font-syne flex items-center justify-center" style={{
-            width: 52, height: 52,
-            background: "linear-gradient(135deg, var(--primary), var(--accent-blue))",
-            borderRadius: 14, fontSize: "var(--fs-2xl)", fontWeight: 800,
-            color: "#000",
-          }}>
-            {user?.name?.[0]?.toUpperCase()}
+      <div className="settings-stack">
+        <section className="settings-card">
+          <div className="settings-card-head">
+            <h2 className="settings-card-title">Profile</h2>
+            <span className="settings-badge">Free</span>
           </div>
-          <div>
-            <p className="font-syne" style={{ color: "var(--text-main)", fontSize: "var(--fs-lg)", fontWeight: 700, margin: "0 0 2px" }}>{user?.name}</p>
-            <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)", margin: 0 }}>{user?.email}</p>
+          <div className="settings-profile">
+            <div className="settings-avatar" aria-hidden="true">{initial}</div>
+            <div className="settings-profile-meta">
+              <p className="settings-name">{user?.name}</p>
+              <p className="settings-email">{user?.email}</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Change Password */}
-      <div className="card" style={{ padding: "var(--spacing-md)" }}>
-        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--text-main)", margin: "0 0 20px" }}>
-          Change Password
-        </h2>
-        <div className="flex flex-col" style={{ gap: 14 }}>
-          <Input label="Current Password" type="password" value={f.old} onChange={set("old")} placeholder="••••••••" />
-          <Input label="New Password" type="password" value={f.newp} onChange={set("newp")} placeholder="••••••••" />
-          <Input label="Confirm New Password" type="password" value={f.confirm} onChange={set("confirm")} placeholder="••••••••" />
-          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", margin: 0 }}>
-            8-15 chars · uppercase · lowercase · number · special (@$!%*?&)
+        <section className="settings-card">
+          <div className="settings-card-head">
+            <h2 className="settings-card-title">Password</h2>
+          </div>
+          <p className="settings-card-desc">
+            Use a strong password you don&apos;t reuse elsewhere.
           </p>
-          <button
-            onClick={changePassword}
-            disabled={loading}
-            className="btn-secondary"
-            style={{ width: "100%" }}
-          >
-            {loading ? "Updating..." : "Update Password"}
-          </button>
-        </div>
-      </div>
+          <form className="settings-form" onSubmit={changePassword}>
+            <label className="settings-field">
+              <span className="settings-label">Current password</span>
+              <input
+                className="settings-input"
+                type="password"
+                value={f.old}
+                onChange={set("old")}
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+            </label>
+            <label className="settings-field">
+              <span className="settings-label">New password</span>
+              <input
+                className="settings-input"
+                type="password"
+                value={f.newp}
+                onChange={set("newp")}
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+            </label>
+            <label className="settings-field">
+              <span className="settings-label">Confirm new password</span>
+              <input
+                className="settings-input"
+                type="password"
+                value={f.confirm}
+                onChange={set("confirm")}
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+            </label>
+            <p className="settings-hint">
+              8–15 characters with uppercase, lowercase, a number, and a special character.
+            </p>
+            <button type="submit" className="btn-primary settings-submit" disabled={loading}>
+              {loading ? "Updating…" : "Update password"}
+            </button>
+          </form>
+        </section>
 
-      {/* Sign Out */}
-      <div className="card" style={{ background: "rgba(255, 59, 59, 0.03)", border: "1px solid rgba(255, 59, 59, 0.1)", padding: "var(--spacing-md)" }}>
-        <h2 style={{ fontSize: "var(--fs-base)", fontWeight: "var(--fw-bold)", color: "var(--accent-red)", margin: "0 0 12px" }}>
-          Sign Out
-        </h2>
-        <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-sm)", margin: "0 0 16px" }}>
-          You'll need to sign in again to access your jobs.
-        </p>
-        <button onClick={onLogout} className="btn-danger">
-          Sign Out
-        </button>
+        <section className="settings-card settings-card--danger">
+          <h2 className="settings-card-title settings-card-title--danger">Sign out</h2>
+          <p className="settings-card-desc">
+            You&apos;ll need to sign in again to access your jobs.
+          </p>
+          <button type="button" className="btn-danger" onClick={onLogout}>
+            Sign out
+          </button>
+        </section>
       </div>
     </div>
   );

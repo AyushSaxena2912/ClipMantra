@@ -1,6 +1,12 @@
 import { useState } from "react";
+import BrandLottie from "./BrandLottie";
 
 const NAV = [
+  {
+    section: "Website", items: [
+      { id: "site-home", icon: "⌂", label: "Home" },
+    ]
+  },
   {
     section: "Create", items: [
       { id: "new-job", icon: "＋", label: "New Job", badge: "New" },
@@ -19,11 +25,16 @@ const NAV = [
   }
 ];
 
-const Sidebar = ({ page, setPage, user, onLogout }) => {
+const Sidebar = ({ page, setPage, user, onLogout, onGoHome }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleNav = (id) => {
+    if (id === "site-home") {
+      onGoHome?.();
+      setIsOpen(false);
+      return;
+    }
     setPage(id);
     setIsOpen(false);
   };
@@ -51,7 +62,10 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
         zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span className="logo-text" style={{ fontSize: "var(--fs-xl)", fontWeight: 800 }}>ClipMantra</span>
+          <span className="logo-text" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--fs-xl)", fontWeight: 800, letterSpacing: "-0.03em" }}>
+            <BrandLottie className="landing-nav-logo" size={26} />
+            ClipMantra
+          </span>
           <span style={{
             fontSize: "var(--fs-xs)", background: '#1a1a2e', padding: '2px 8px',
             borderRadius: 4, color: 'var(--text-muted)', border: '1px solid var(--border-color)'
@@ -132,7 +146,12 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
           borderBottom: "1px solid var(--border-muted)",
           marginBottom: 8
         }}>
-          {!isCollapsed && <span className="logo-text" style={{ fontSize: "var(--fs-xl)", fontWeight: 800, whiteSpace: 'nowrap' }}>ClipMantra</span>}
+          {!isCollapsed && (
+            <span className="logo-text" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: "var(--fs-xl)", fontWeight: 800, whiteSpace: "nowrap", letterSpacing: "-0.03em" }}>
+              <BrandLottie className="landing-nav-logo" size={28} />
+              ClipMantra
+            </span>
+          )}
           <button
             className="collapse-btn"
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -180,8 +199,8 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
                     display: "flex", alignItems: "center", gap: 16,
                     padding: isCollapsed ? "12px 0" : "10px 14px",
                     justifyContent: isCollapsed ? "center" : "flex-start",
-                    background: page === n.id ? "rgba(0, 229, 153, 0.08)" : "transparent",
-                    border: page === n.id ? "1px solid rgba(0, 229, 153, 0.3)" : "1px solid transparent",
+                    background: page === n.id ? "var(--primary-soft)" : "transparent",
+                    border: page === n.id ? "1px solid var(--primary-border)" : "1px solid transparent",
                     borderRadius: 10,
                     color: page === n.id ? "#fff" : "var(--text-dim)",
                     cursor: "pointer",
@@ -194,8 +213,8 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
                     {!isCollapsed && <span style={{ whiteSpace: 'nowrap', fontWeight: page === n.id ? 600 : 400 }}>{n.label}</span>}
                     {n.badge && !isCollapsed && (
                       <span style={{
-                        fontSize: "var(--fs-xs)", background: 'var(--primary)', color: '#000',
-                        padding: '1px 4px', borderRadius: 4, fontWeight: 700,
+                        fontSize: "var(--fs-xs)", background: 'var(--primary)', color: '#fff',
+                        padding: '2px 6px', borderRadius: 999, fontWeight: 700,
                         textTransform: 'uppercase', marginLeft: 'auto'
                       }}>{n.badge}</span>
                     )}
@@ -230,10 +249,10 @@ const Sidebar = ({ page, setPage, user, onLogout }) => {
             }}>
               <div style={{
                 minWidth: 32, height: 32, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #1e1e3e, #0a0a1a)',
+                background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(10, 10, 20, 0.9))',
                 display: 'flex', alignItems: 'center',
-                justifyContent: 'center', color: 'var(--primary)',
-                fontSize: 14, fontWeight: 700, border: '1px solid rgba(255,255,255,0.05)'
+                justifyContent: 'center', color: 'var(--primary-hover)',
+                fontSize: 14, fontWeight: 700, border: '1px solid rgba(168, 85, 247, 0.25)'
               }}>
                 {user?.name?.charAt(0).toUpperCase()}
               </div>

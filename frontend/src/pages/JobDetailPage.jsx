@@ -2,9 +2,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { api, getToken } from "../api";
 import { API_BASE } from "../api";
 import StatusBadge from "../components/StatusBadge";
-import { fmtTime } from "../utils/helpers";
 
-const STEPS = ["queued", "downloading", "transcribing", "rendering", "completed"];
+const STEPS = [
+  { key: "queued", label: "Queued", hint: "Waiting to start" },
+  { key: "downloading", label: "Downloading", hint: "Getting your video" },
+  { key: "transcribing", label: "Reading audio", hint: "Speech to text" },
+  { key: "rendering", label: "Making clips", hint: "Cutting highlights" },
+  { key: "completed", label: "Done", hint: "Ready to download" },
+];
+
+const ACTIVE = ["queued", "downloading", "transcribing", "rendering", "processing"];
 
 const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
   const [job, setJob] = useState(initialJob);
@@ -19,9 +26,6 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
       : JSON.parse(job.clips_path || "[]")
     : [];
 
-  /* Always pull the latest job record on mount — the object handed down
-     from the dashboard list can be stale (e.g. the job finished rendering
-     clips while the user wasn't watching this page live via SSE). */
   useEffect(() => {
     api(`/jobs/${initialJob.id}`).then((r) => {
       if (r.ok) {
@@ -31,29 +35,23 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
     });
   }, [initialJob.id]);
 
-  /* Load highlights */
   useEffect(() => {
     if (job.highlights_path) {
       const path = job.highlights_path.replace(/^storage\//, "");
-
       fetch(`${API_BASE.replace("/api", "")}/storage/${path}`)
         .then((r) => (r.ok ? r.json() : []))
         .then((d) => setHighlights(Array.isArray(d) ? d : []))
-        .catch(() => { });
+        .catch(() => {});
     }
   }, [job.highlights_path]);
 
-  /* SSE stream */
-
   const startStream = useCallback(() => {
     if (esRef.current) esRef.current.close();
-
     setStreaming(true);
 
     const es = new EventSource(
       `${API_BASE}/jobs/${job.id}/stream?token=${getToken()}`
     );
-
     esRef.current = es;
 
     es.onmessage = (e) => {
@@ -64,7 +62,6 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
         if (d.status === "completed" || d.status === "failed") {
           setStreaming(false);
           es.close();
-
           api(`/jobs/${job.id}`).then((r) => {
             if (r.ok) {
               setJob(r.data.data);
@@ -72,7 +69,7 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
             }
           });
         }
-      } catch { }
+      } catch {}
     };
 
     es.onerror = () => {
@@ -82,316 +79,184 @@ const JobDetailPage = ({ job: initialJob, onBack, toast, onRefresh }) => {
   }, [job.id, onRefresh]);
 
   useEffect(() => {
-    const active = [
-      "queued",
-      "downloading",
-      "transcribing",
-      "rendering",
-      "processing",
-    ].includes(job.status);
-
-    if (active) startStream();
-
+    if (ACTIVE.includes(job.status)) startStream();
     return () => {
       if (esRef.current) esRef.current.close();
     };
   }, []);
 
+  const stepKeys = STEPS.map((s) => s.key);
   const currentStep =
     liveStatus === "completed"
-      ? STEPS.length - 1
-      : STEPS.indexOf(liveStatus);
+      ? stepKeys.length - 1
+      : liveStatus === "processing"
+        ? stepKeys.indexOf("rendering")
+        : Math.max(0, stepKeys.indexOf(liveStatus));
+
+  const progressPct =
+    liveStatus === "completed"
+      ? 100
+      : liveStatus === "failed"
+        ? 0
+        : Math.round(((currentStep + (ACTIVE.includes(liveStatus) ? 0.45 : 0)) / (stepKeys.length - 1)) * 100);
+
+  const statusCopy =
+    liveStatus === "failed"
+      ? "Something went wrong with this job."
+      : liveStatus === "completed"
+        ? clips.length
+          ? `${clips.length} clip${clips.length === 1 ? "" : "s"} ready to download.`
+          : "Job finished."
+        : streaming
+          ? "Working on your video — this page updates live."
+          : "Job is in progress.";
 
   return (
-    <div>
-      {/* Back */}
-      <button
-        onClick={onBack}
-        style={{
-          background: "none",
-          border: "none",
-          color: "var(--text-muted)",
-          cursor: "pointer",
-          fontFamily: 'var(--font-main)',
-          fontSize: "var(--fs-sm)",
-          marginBottom: 24,
-          padding: 0,
-        }}
-      >
+    <div className="jobdetail">
+      <button type="button" className="jobdetail-back" onClick={onBack}>
         ← Back to jobs
       </button>
 
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: 32,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <div>
-          <div className="flex items-center" style={{ gap: 12, marginBottom: 6 }}>
-            <h1 style={{ fontSize: "var(--fs-3xl)", fontWeight: "var(--fw-extrabold)", color: "#fff", margin: 0 }}>
-              Job Details
-            </h1>
-
+      <header className="jobdetail-header">
+        <div className="jobdetail-header-main">
+          <div className="jobdetail-title-row">
+            <h1 className="jobdetail-title">Job details</h1>
             <StatusBadge status={liveStatus} />
-
             {streaming && (
-              <span
-                style={{
-                  color: "var(--primary)",
-                  fontSize: "var(--fs-xs)",
-                  fontFamily: 'var(--font-main)',
-                  animation: "pulse 1.5s infinite",
-                }}
-              >
-                ● LIVE
+              <span className="jobdetail-live">
+                <span className="jobdetail-live-dot" aria-hidden="true" />
+                Live
               </span>
             )}
           </div>
-
-          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", margin: 0, maxWidth: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <a
+            className="jobdetail-url"
+            href={job.url}
+            target="_blank"
+            rel="noreferrer"
+            title={job.url}
+          >
             {job.url}
-          </p>
+          </a>
+          <p className="jobdetail-status-copy">{statusCopy}</p>
         </div>
 
-        {[
-          "queued",
-          "downloading",
-          "transcribing",
-          "rendering",
-          "processing",
-        ].includes(liveStatus) &&
-          !streaming && (
-            <button
-              onClick={startStream}
-              style={{
-                padding: "10px 18px",
-                background: "var(--bg-input)",
-                border: "1px solid rgba(0, 229, 153, 0.2)",
-                borderRadius: "var(--radius-sm)",
-                color: "var(--primary)",
-                cursor: "pointer",
-                fontFamily: 'var(--font-main)',
-                fontSize: "var(--fs-sm)",
-              }}
-            >
-              ↻ Watch Live
-            </button>
-          )}
-      </div>
+        {ACTIVE.includes(liveStatus) && !streaming && (
+          <button type="button" className="btn-secondary" onClick={startStream}>
+            Watch live
+          </button>
+        )}
+      </header>
 
-      {/* Pipeline */}
-      {liveStatus !== "failed" && (
-        <div className="card pipeline-card" style={{ padding: "24px 28px", marginBottom: 28 }}>
-          <p style={{ color: "var(--text-dim)", fontSize: "var(--fs-xs)", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 20px" }}>
-            Processing Pipeline
+      {liveStatus === "failed" ? (
+        <section className="jobdetail-failed">
+          <h2 className="jobdetail-failed-title">Job failed</h2>
+          <p className="jobdetail-failed-desc">
+            Try creating a new job with the same link, or pick a different video.
           </p>
+          <button type="button" className="btn-primary" onClick={onBack}>
+            Back to jobs
+          </button>
+        </section>
+      ) : (
+        <section className="jobdetail-pipeline">
+          <div className="jobdetail-pipeline-top">
+            <div>
+              <p className="jobdetail-kicker">Progress</p>
+              <h2 className="jobdetail-pipeline-title">
+                {liveStatus === "completed" ? "All steps complete" : "Making your clips"}
+              </h2>
+            </div>
+            <span className="jobdetail-progress-pill">{progressPct}%</span>
+          </div>
 
-          <div className="pipeline-container" style={{ display: "flex", alignItems: "center" }}>
+          <div className="jobdetail-progress-track" aria-hidden="true">
+            <div className="jobdetail-progress-fill" style={{ width: `${progressPct}%` }} />
+          </div>
+
+          <ol className="jobdetail-steps">
             {STEPS.map((step, i) => {
               const done = i < currentStep || liveStatus === "completed";
-              const active =
-                i === currentStep && liveStatus !== "completed";
-              const color = done ? "var(--primary)" : active ? "var(--accent-orange)" : "var(--border-color)";
-
+              const active = i === currentStep && liveStatus !== "completed";
               return (
-                <div
-                  key={step}
-                  className="pipeline-step"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flex: i < STEPS.length - 1 ? 1 : "none",
-                  }}
+                <li
+                  key={step.key}
+                  className={`jobdetail-step${done ? " is-done" : ""}${active ? " is-active" : ""}`}
                 >
-                  <div
-                    className="step-marker-container"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 6,
-                      zIndex: 2
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        background: done
-                          ? "rgba(0, 229, 153, 0.08)"
-                          : active
-                            ? "rgba(255, 153, 0, 0.1)"
-                            : "var(--bg-input)",
-                        border: `2px solid ${color}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "var(--fs-xs)",
-                        color,
-                        boxShadow: active
-                          ? `0 0 12px ${color}44`
-                          : "none",
-                        animation: active
-                          ? "pulse 1.5s infinite"
-                          : "none",
-                      }}
-                    >
-                      {done ? "✓" : i + 1}
-                    </div>
-
-                    <span
-                      className="step-label"
-                      style={{
-                        color: active
-                          ? "#fff"
-                          : done
-                            ? "var(--text-muted)"
-                            : "var(--text-dim)",
-                        fontSize: "var(--fs-xs)",
-                        fontFamily: 'var(--font-main)',
-                        letterSpacing: 1,
-                        textTransform: "uppercase",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {step}
-                    </span>
-                  </div>
-
-                  {i < STEPS.length - 1 && (
-                    <div
-                      className="step-connector"
-                      style={{
-                        flex: 1,
-                        height: 2,
-                        background: done
-                          ? "rgba(0, 229, 153, 0.2)"
-                          : "var(--bg-card)",
-                        margin: "0 4px",
-                        marginBottom: 22,
-                      }}
-                    />
-                  )}
-                </div>
+                  <span className="jobdetail-step-marker">
+                    {done ? "✓" : i + 1}
+                  </span>
+                  <span className="jobdetail-step-label">{step.label}</span>
+                  <span className="jobdetail-step-hint">{step.hint}</span>
+                </li>
               );
             })}
-          </div>
-        </div>
+          </ol>
+        </section>
       )}
 
-      {/* Video Clips */}
       {clips.length > 0 && (
-        <div style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: "var(--fs-lg)", fontWeight: "var(--fw-bold)", color: "#fff", margin: "0 0 16px" }}>
-            Generated Clips
-          </h2>
+        <section className="jobdetail-clips">
+          <div className="jobdetail-clips-head">
+            <div>
+              <h2 className="jobdetail-clips-title">Your clips</h2>
+              <p className="jobdetail-clips-sub">
+                {clips.length} ready · download anytime
+              </p>
+            </div>
+          </div>
 
-          <div className="clips-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '20px'
-          }}>
+          <div className="jobdetail-clips-grid">
             {clips.map((clipPath, i) => {
               const videoUrl = clipPath.startsWith("http")
                 ? clipPath
-                : `${API_BASE.replace("/api", "")}/storage/${clipPath.replace(
-                  /^storage\//,
-                  ""
-                )}`;
+                : `${API_BASE.replace("/api", "")}/storage/${clipPath.replace(/^storage\//, "")}`;
 
               return (
-                <div key={i} className="card clip-card" style={{ padding: 0, overflow: "hidden" }}>
-                  <video
-                    controls
-                    src={videoUrl}
-                    style={{
-                      width: "100%",
-                      aspectRatio: '16/9',
-                      background: "#000",
-                      display: "block",
-                    }}
-                  />
-
-                  <div style={{ padding: "16px" }} className="flex justify-between items-center">
-                    <span className="font-syne" style={{ color: "#fff", fontSize: "var(--fs-base)", fontWeight: "var(--fw-semibold)" }}>
-                      Clip {i + 1}
-                    </span>
-
+                <article key={i} className="jobdetail-clip">
+                  <video controls src={videoUrl} className="jobdetail-clip-video" />
+                  <div className="jobdetail-clip-meta">
+                    <span className="jobdetail-clip-name">Clip {i + 1}</span>
                     <a
                       href={videoUrl}
                       download={`clip_${i + 1}.mp4`}
-                      style={{
-                        background: "rgba(0, 229, 153, 0.1)",
-                        border: "1px solid var(--primary)",
-                        borderRadius: "var(--radius-sm)",
-                        color: "var(--primary)",
-                        padding: "6px 14px",
-                        fontSize: "var(--fs-xs)",
-                        fontFamily: "var(--font-main)",
-                        textDecoration: "none",
-                        fontWeight: 600,
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#000'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0, 229, 153, 0.1)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                      className="jobdetail-clip-download"
                     >
-                      ↓ Download
+                      Download
                     </a>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      <style>{`
-        @media (max-width: 768px) {
-          .pipeline-container {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 0 !important;
-          }
-          .pipeline-step {
-            flex-direction: row !important;
-            width: 100% !important;
-            flex: none !important;
-            height: 60px !important;
-          }
-          .step-marker-container {
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 16px !important;
-          }
-          .step-label {
-            font-size: 11px !important;
-          }
-          .step-connector {
-            position: absolute !important;
-            left: 13px !important;
-            top: 28px !important;
-            width: 2px !important;
-            height: 32px !important;
-            margin: 0 !important;
-          }
-          .pipeline-card {
-            padding: 20px !important;
-          }
-          .clips-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .clip-card video {
-             max-height: none !important;
-          }
-        }
-      `}</style>
+      {highlights.length > 0 && liveStatus === "completed" && (
+        <section className="jobdetail-highlights">
+          <h2 className="jobdetail-clips-title">Highlight moments</h2>
+          <p className="jobdetail-clips-sub">Moments the AI ranked highest</p>
+          <ul className="jobdetail-highlight-list">
+            {highlights.slice(0, 8).map((h, i) => (
+              <li key={i} className="jobdetail-highlight-item">
+                <span className="jobdetail-highlight-index">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <p className="jobdetail-highlight-title">
+                    {h.title || h.reason || `Moment ${i + 1}`}
+                  </p>
+                  {(h.start != null || h.end != null) && (
+                    <p className="jobdetail-highlight-time">
+                      {h.start != null ? `${Math.round(h.start)}s` : "—"}
+                      {" → "}
+                      {h.end != null ? `${Math.round(h.end)}s` : "—"}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 };
