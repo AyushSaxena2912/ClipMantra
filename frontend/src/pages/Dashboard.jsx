@@ -5,12 +5,28 @@ import HomePage from "./HomePage";
 import NewJobPage from "./NewJobPage";
 import JobDetailPage from "./JobDetailPage";
 import SettingsPage from "./SettingsPage";
+import { parseLocation, pathForDash, navigate } from "../nav";
 
 const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
-  const [page, setPage] = useState("home");
+  const initial = parseLocation();
+  const [page, setPageState] = useState(() =>
+    initial.app === "dashboard" ? initial.dash || "home" : "home"
+  );
   const [jobs, setJobs] = useState([]);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(() =>
+    initial.dash === "job-detail" && initial.jobId ? { id: initial.jobId } : null
+  );
   const [loadingJobs, setLoadingJobs] = useState(false);
+  const [loadingJob, setLoadingJob] = useState(
+    () => initial.dash === "job-detail" && !!initial.jobId
+  );
+
+  const setPage = (next, job = null) => {
+    setPageState(next);
+    if (job) setSelectedJob(job);
+    const jobId = job?.id ?? (next === "job-detail" ? selectedJob?.id : null);
+    navigate(pathForDash(next, jobId));
+  };
 
   const refetchJobs = useCallback(async () => {
     const r = await api("/jobs");
@@ -27,6 +43,29 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
     if (page === "home") fetchJobs();
   }, [page]);
 
+  // Restore job detail after refresh from /app/jobs/:id
+  useEffect(() => {
+    if (page !== "job-detail" || !selectedJob?.id) return;
+    if (selectedJob.status != null) {
+      setLoadingJob(false);
+      return;
+    }
+    let cancelled = false;
+    setLoadingJob(true);
+    api(`/jobs/${selectedJob.id}`).then((r) => {
+      if (cancelled) return;
+      setLoadingJob(false);
+      if (r.ok) setSelectedJob(r.data.data);
+      else {
+        toast?.("Job not found", "error");
+        setPageState("home");
+        setSelectedJob(null);
+        navigate("/app", { replace: true });
+      }
+    });
+    return () => { cancelled = true; };
+  }, [page, selectedJob?.id]);
+
   // Poll (without flashing the loading spinner) while any job is still
   // processing, so cards/badges update on their own instead of requiring a
   // manual refresh click.
@@ -41,9 +80,29 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
     return () => clearInterval(interval);
   }, [page, jobs, refetchJobs]);
 
+  // Browser back/forward inside the dashboard
+  useEffect(() => {
+    const onPop = () => {
+      const loc = parseLocation();
+      if (loc.app !== "dashboard") return;
+      setPageState(loc.dash || "home");
+      if (loc.dash === "job-detail" && loc.jobId) {
+        setSelectedJob((prev) => (prev?.id === loc.jobId ? prev : { id: loc.jobId }));
+        setLoadingJob(true);
+      } else {
+        setSelectedJob(null);
+        setLoadingJob(false);
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   const openJob = async (job) => {
     setSelectedJob(job);
-    setPage("job-detail");
+    setPageState("job-detail");
+    setLoadingJob(false);
+    navigate(pathForDash("job-detail", job.id));
     // Refresh in the background so the detail page (and the card once we're
     // back) reflect the latest status/clips instead of a stale list snapshot.
     const r = await api(`/jobs/${job.id}`);
@@ -68,11 +127,20 @@ const Dashboard = ({ user, onLogout, toast, onGoHome }) => {
         )}
         {page === "new-job" && (
           <NewJobPage
-            onJobCreated={(j) => { fetchJobs(); setSelectedJob(j); setPage("job-detail"); }}
+            onJobCreated={(j) => {
+              fetchJobs();
+              setSelectedJob(j);
+              setPageState("job-detail");
+              setLoadingJob(false);
+              navigate(pathForDash("job-detail", j.id));
+            }}
             toast={toast}
           />
         )}
-        {page === "job-detail" && selectedJob && (
+        {page === "job-detail" && loadingJob && (
+          <div style={{ padding: 40, color: "var(--text-muted)" }}>Loading job…</div>
+        )}
+        {page === "job-detail" && !loadingJob && selectedJob?.status != null && (
           <JobDetailPage
             job={selectedJob}
             onBack={() => setPage("home")}

@@ -1,9 +1,10 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { getUser, removeToken, removeUser } from "./api";
 import { useToast } from "./hooks/useToast";
 import Toasts from "./components/Toast";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
+import { parseLocation, pathForApp, navigate } from "./nav";
 
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 
@@ -18,14 +19,60 @@ function PageLoader() {
   );
 }
 
+function resolveAppPage(user) {
+  const loc = parseLocation();
+  if (loc.app === "dashboard") return user ? "dashboard" : "auth";
+  if (loc.app === "auth") return "auth";
+  return "landing";
+}
+
 export default function App() {
   const [user, setUser] = useState(() => getUser());
-  const [page, setPage] = useState(() => (getUser() ? "dashboard" : "landing"));
+  const [page, setPageState] = useState(() => resolveAppPage(getUser()));
   const { toasts, add: toast } = useToast();
 
-  const handleLogin = (u) => { setUser(u); setPage("dashboard"); };
+  const setPage = (next, { replace = false } = {}) => {
+    setPageState(next);
+    if (next === "dashboard") {
+      // Keep deep dashboard paths (e.g. /app/settings); only enter /app if outside it.
+      if (!window.location.pathname.startsWith("/app")) {
+        navigate("/app", { replace });
+      }
+      return;
+    }
+    navigate(pathForApp(next), { replace });
+  };
+
+  useEffect(() => {
+    const onPop = () => {
+      const u = getUser();
+      const next = resolveAppPage(u);
+      setUser(u);
+      setPageState(next);
+      if (parseLocation().app === "dashboard" && !u) {
+        navigate("/auth", { replace: true });
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // Normalize URL when a logged-out user hits /app/*
+  useEffect(() => {
+    if (page === "auth" && parseLocation().app === "dashboard" && !user) {
+      navigate("/auth", { replace: true });
+    }
+  }, [page, user]);
+
+  const handleLogin = (u) => {
+    setUser(u);
+    setPageState("dashboard");
+    navigate("/app", { replace: true });
+  };
   const handleLogout = () => {
-    removeToken(); removeUser(); setUser(null); setPage("landing"); toast("Signed out.", "info");
+    removeToken(); removeUser(); setUser(null); setPageState("landing");
+    navigate("/", { replace: true });
+    toast("Signed out.", "info");
   };
   const goLanding = () => setPage("landing");
   const goDashboard = () => setPage("dashboard");
